@@ -4,6 +4,7 @@ import 'features/patients/patients_screen.dart';
 import 'features/medications/medications_screen.dart';
 import 'features/schedules/schedules_screen.dart';
 import 'features/reminders/reminders_screen.dart';
+import 'theme/app_theme.dart';
 
 class MedTrackApp extends StatelessWidget {
   const MedTrackApp({super.key});
@@ -12,7 +13,7 @@ class MedTrackApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MedTrack OSS',
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      theme: AppTheme.lightTheme,
       initialRoute: '/',
       routes: {
         '/': (context) => const HomeScreen(),
