@@ -49,28 +49,28 @@ class HomeScreen extends StatelessWidget {
               children: [
                 IconButton(
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/patients');
+                    Navigator.pushNamedAndRemoveUntil(context, '/patients', (route) => route.isFirst);
                   },
                   icon: const Icon(Icons.people),
                   tooltip: 'View Patients',
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/medications');
+                    Navigator.pushNamedAndRemoveUntil(context, '/medications', (route) => route.isFirst);
                   },
                   icon: const Icon(Icons.medication_liquid),
                   tooltip: 'View Medications',
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/schedules');
+                    Navigator.pushNamedAndRemoveUntil(context, '/schedules', (route) => route.isFirst);
                   },
                   icon: const Icon(Icons.schedule),
                   tooltip: 'View Schedules',
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/reminders');
+                    Navigator.pushNamedAndRemoveUntil(context, '/reminders', (route) => route.isFirst);
                   },
                   icon: const Icon(Icons.alarm),
                   tooltip: 'View Reminders',
