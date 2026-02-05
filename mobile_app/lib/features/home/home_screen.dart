@@ -39,6 +39,47 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(color: Colors.blue.shade100),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/patients');
+                  },
+                  icon: const Icon(Icons.people),
+                  tooltip: 'View Patients',
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/medications');
+                  },
+                  icon: const Icon(Icons.medication_liquid),
+                  tooltip: 'View Medications',
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/schedules');
+                  },
+                  icon: const Icon(Icons.schedule),
+                  tooltip: 'View Schedules',
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/reminders');
+                  },
+                  icon: const Icon(Icons.alarm),
+                  tooltip: 'View Reminders',
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
