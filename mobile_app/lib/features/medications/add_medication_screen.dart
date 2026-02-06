@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-final _formKey = GlobalKey<FormState>();
-
 class AddMedicationScreen extends StatefulWidget {
   const AddMedicationScreen({super.key});
 
@@ -10,6 +8,7 @@ class AddMedicationScreen extends StatefulWidget {
 }
 
 class _AddMedicationScreenState extends State<AddMedicationScreen> {
+  final _formKey = GlobalKey<FormState>();
   TimeOfDay timeOfDay = TimeOfDay.now();
   List<bool> selectedDays = [false, false, false, false, false, false, false];
   List<String> days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -80,7 +79,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                       SizedBox(width: 8),
                       Icon(Icons.access_time),
                       SizedBox(width: 8),
-                      Text('${timeOfDay.hour}:${timeOfDay.minute}'),
+                      Text(timeOfDay.format(context).toString()),
                       SizedBox(width: 8),
                     ],
                   ),
