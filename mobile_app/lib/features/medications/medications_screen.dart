@@ -8,17 +8,6 @@ final Random _random = Random();
 
 class MedicationsScreen extends StatefulWidget {
   const MedicationsScreen({super.key});
-  static const int n = 10;
-  static final List<Medication> medicationList = List.generate(
-    10,
-    (index) => Medication(
-      id: index.toString(),
-      name: 'Medication ${index + 1}',
-      dosage: '${(index + 1) * 10} mg',
-      time: _random.nextInt(24).toString(),
-      frequency: List.generate(7, (day) => _random.nextBool()),
-    ),
-  );
 
   @override
   State<MedicationsScreen> createState() => _MedicationsScreenState();
