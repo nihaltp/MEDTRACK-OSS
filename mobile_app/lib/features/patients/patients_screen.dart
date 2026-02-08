@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../models/patient.dart';
+import 'widgets/patient_card.dart';
+import 'widgets/patient_details_view.dart';
 
 class PatientsScreen extends StatefulWidget {
   const PatientsScreen({super.key});
@@ -8,257 +11,147 @@ class PatientsScreen extends StatefulWidget {
 }
 
 class _PatientsScreenState extends State<PatientsScreen> {
-  // Mock patient data
-  final List<_Patient> patients = [
-    _Patient(
-      id: 1,
-      name: 'John Doe',
-      age: 65,
-      condition: 'Hypertension, Diabetes',
-      avatar: '👨‍🦳',
-      adherenceRate: 92,
+  final List<Patient> _patients = [
+    Patient(
+      id: 'P001',
+      name: 'Rajesh Kumar',
+      age: 45,
+      gender: 'Male',
+      condition: 'Hypertension',
+      status: 'Stable',
+      lastVisit: DateTime.now().subtract(const Duration(days: 2)),
+      phoneNumber: '+91 98765 43210',
     ),
-    _Patient(
-      id: 2,
-      name: 'Jane Smith',
-      age: 58,
-      condition: 'Thyroid Disorder',
-      avatar: '👩',
-      adherenceRate: 88,
+    Patient(
+      id: 'P002',
+      name: 'Priya Sharma',
+      age: 62,
+      gender: 'Female',
+      condition: 'Type 2 Diabetes',
+      status: 'Recovering',
+      lastVisit: DateTime.now().subtract(const Duration(days: 5)),
+      phoneNumber: '+91 87654 32109',
     ),
-    _Patient(
-      id: 3,
-      name: 'Michael Johnson',
-      age: 72,
-      condition: 'Heart Disease',
-      avatar: '👨‍🦲',
-      adherenceRate: 95,
+    Patient(
+      id: 'P003',
+      name: 'Amit Patel',
+      age: 28,
+      gender: 'Male',
+      condition: 'Asthma',
+      status: 'Stable',
+      lastVisit: DateTime.now().subtract(const Duration(days: 12)),
+      phoneNumber: '+91 76543 21098',
+    ),
+    Patient(
+      id: 'P004',
+      name: 'Suresh Iyer',
+      age: 75,
+      gender: 'Male',
+      condition: 'Post-Surgery (Knee)',
+      status: 'Critical',
+      lastVisit: DateTime.now().subtract(const Duration(hours: 4)),
+      phoneNumber: '+91 65432 10987',
+    ),
+    Patient(
+      id: 'P005',
+      name: 'Lakshmi Narayan',
+      age: 54,
+      gender: 'Female',
+      condition: 'Migraine',
+      status: 'Stable',
+      lastVisit: DateTime.now().subtract(const Duration(days: 20)),
+      phoneNumber: '+91 99887 76655',
     ),
   ];
+
+  String _searchQuery = '';
+
+  List<Patient> get _filteredPatients {
+    if (_searchQuery.isEmpty) return _patients;
+    return _patients.where((p) =>
+      p.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+      p.condition.toLowerCase().contains(_searchQuery.toLowerCase())
+    ).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Patient Profiles'),
+        title: Text(
+          'Patients',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
         elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline),
+            color: Theme.of(context).primaryColor,
+            onPressed: () {
+             
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
-          // Search Bar
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.white,
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search patients...',
-                prefixIcon: const Icon(Icons.search_rounded),
-                suffixIcon: const Icon(Icons.filter_list_rounded),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-              ),
-            ),
-          ),
-          // Patients List
+          _buildSearchBar(),
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              itemCount: patients.length,
+              padding: const EdgeInsets.only(top: 8, bottom: 24),
+              itemCount: _filteredPatients.length,
               itemBuilder: (context, index) {
-                final patient = patients[index];
-                return _PatientCard(patient: patient);
+                final patient = _filteredPatients[index];
+                return PatientCard(
+                  patient: patient,
+                  onTap: () => _navigateToPatientDetails(patient),
+                );
               },
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Add patient feature coming soon!')),
-          );
-        },
-        backgroundColor: const Color(0xFF0066CC),
-        child: const Icon(Icons.add_rounded),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      color: Colors.white,
+      child: TextField(
+        onChanged: (value) => setState(() => _searchQuery = value),
+        decoration: InputDecoration(
+          hintText: 'Search patients, conditions...',
+          hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Colors.grey[500],
+              ),
+          prefixIcon: const Icon(Icons.search),
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
       ),
     );
   }
-}
 
-class _Patient {
-  final int id;
-  final String name;
-  final int age;
-  final String condition;
-  final String avatar;
-  final int adherenceRate;
-
-  _Patient({
-    required this.id,
-    required this.name,
-    required this.age,
-    required this.condition,
-    required this.avatar,
-    required this.adherenceRate,
-  });
-}
-
-class _PatientCard extends StatelessWidget {
-  final _Patient patient;
-
-  const _PatientCard({required this.patient});
-
-  @override
-  Widget build(BuildContext context) {
-    final adherenceColor = patient.adherenceRate >= 90
-        ? const Color(0xFF4CAF50)
-        : patient.adherenceRate >= 75
-            ? const Color(0xFFFFC107)
-            : const Color(0xFFFF6B6B);
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: LinearGradient(
-            colors: [
-              Colors.white,
-              Colors.grey[50]!,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                // Avatar
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0066CC).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    patient.avatar,
-                    style: const TextStyle(fontSize: 32),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // Patient Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        patient.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${patient.age} years • ${patient.condition}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Adherence Bar
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Adherence Rate',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.black54,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: patient.adherenceRate / 100,
-                          minHeight: 8,
-                          backgroundColor: Colors.grey[300],
-                          valueColor: AlwaysStoppedAnimation<Color>(adherenceColor),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Container(
-                  decoration: BoxDecoration(
-                    color: adherenceColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  child: Text(
-                    '${patient.adherenceRate}%',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: adherenceColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // Action Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('View details feature coming soon!')),
-                      );
-                    },
-                    icon: const Icon(Icons.info_outline_rounded, size: 18),
-                    label: const Text('Details'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Edit patient feature coming soon!')),
-                      );
-                    },
-                    icon: const Icon(Icons.edit_rounded, size: 18),
-                    label: const Text('Edit'),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+  void _navigateToPatientDetails(Patient patient) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PatientDetailsView(patient: patient),
       ),
     );
   }

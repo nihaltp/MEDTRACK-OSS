@@ -263,6 +263,47 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(color: Colors.blue.shade100),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(context, '/patients', (route) => route.isFirst);
+                  },
+                  icon: const Icon(Icons.people),
+                  tooltip: 'View Patients',
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(context, '/medications', (route) => route.isFirst);
+                  },
+                  icon: const Icon(Icons.medication_liquid),
+                  tooltip: 'View Medications',
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(context, '/schedules', (route) => route.isFirst);
+                  },
+                  icon: const Icon(Icons.schedule),
+                  tooltip: 'View Schedules',
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(context, '/reminders', (route) => route.isFirst);
+                  },
+                  icon: const Icon(Icons.alarm),
+                  tooltip: 'View Reminders',
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
