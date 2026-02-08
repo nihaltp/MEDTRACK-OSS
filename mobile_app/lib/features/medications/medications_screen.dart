@@ -15,45 +15,49 @@ class MedicationsScreen extends StatefulWidget {
 
 class _MedicationsScreenState extends State<MedicationsScreen> {
   // Mock medication data
-  final List<_Medication> medications = [
-    _Medication(
+  final List<Medication> medications = [
+    Medication(
       id: 1,
       name: 'Lisinopril',
       dosage: '10 mg',
       frequency: 'Once daily',
+      frequencyWeekly: [true, true, true, true, true, true, true],
       purpose: 'Blood pressure control',
       icon: '💊',
       color: const Color(0xFFFF6B6B),
       nextDue: '2:00 PM',
       isActive: true,
     ),
-    _Medication(
+    Medication(
       id: 2,
       name: 'Metformin',
       dosage: '500 mg',
       frequency: 'Twice daily',
+      frequencyWeekly: [true, false, true, false, true, false, true],
       purpose: 'Diabetes management',
       icon: '💉',
       color: const Color(0xFF00B4D8),
       nextDue: '1:30 PM',
       isActive: true,
     ),
-    _Medication(
+    Medication(
       id: 3,
       name: 'Atorvastatin',
       dosage: '20 mg',
       frequency: 'Once daily',
+      frequencyWeekly: [true, true, true, true, true, true, true],
       purpose: 'Cholesterol control',
       icon: '⚕️',
       color: const Color(0xFF4CAF50),
       nextDue: '8:00 PM',
       isActive: true,
     ),
-    _Medication(
+    Medication(
       id: 4,
       name: 'Aspirin',
       dosage: '81 mg',
       frequency: 'Once daily',
+      frequencyWeekly: [true, true, true, true, true, true, true],
       purpose: 'Blood thinner',
       icon: '💊',
       color: const Color(0xFFFFC107),
@@ -177,7 +181,7 @@ class _FilterChip extends StatelessWidget {
 }
 
 class _MedicationCard extends StatelessWidget {
-  final _Medication medication;
+  final Medication medication;
 
   const _MedicationCard({required this.medication});
 
