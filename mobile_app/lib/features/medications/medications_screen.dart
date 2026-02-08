@@ -150,30 +150,6 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
   }
 }
 
-class _Medication {
-  final int id;
-  final String name;
-  final String dosage;
-  final String frequency;
-  final String purpose;
-  final String icon;
-  final Color color;
-  final String nextDue;
-  final bool isActive;
-
-  _Medication({
-    required this.id,
-    required this.name,
-    required this.dosage,
-    required this.frequency,
-    required this.purpose,
-    required this.icon,
-    required this.color,
-    required this.nextDue,
-    required this.isActive,
-  });
-}
-
 class _FilterChip extends StatelessWidget {
   final String label;
   final bool isActive;
