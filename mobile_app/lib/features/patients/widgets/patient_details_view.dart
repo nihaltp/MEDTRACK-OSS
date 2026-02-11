@@ -13,7 +13,11 @@ class PatientDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).maybePop(),
+          tooltip: 'Back',
+        ),
         title: const Text('Patient Profile'),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
