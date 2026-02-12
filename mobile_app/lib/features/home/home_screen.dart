@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import '../patients/patients_screen.dart';
-import '../medications/medications_screen.dart';
-import '../schedules/schedules_screen.dart';
-import '../reminders/reminders_screen.dart';
+import 'package:mobile_app/routes.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,27 +16,27 @@ class _HomeScreenState extends State<HomeScreen> {
     _NavItem(
       icon: Icons.home_rounded,
       label: 'Home',
-      route: HomeScreen.route,
+      route: Routes.home,
     ),
     _NavItem(
       icon: Icons.people_rounded,
       label: 'Patients',
-      route: PatientsScreen.route,
+      route: Routes.patients,
     ),
     _NavItem(
       icon: Icons.medication_rounded,
       label: 'Medications',
-      route: MedicationsScreen.route,
+      route: Routes.medications,
     ),
     _NavItem(
       icon: Icons.schedule_rounded,
       label: 'Schedules',
-      route: SchedulesScreen.route,
+      route: Routes.schedules,
     ),
     _NavItem(
       icon: Icons.notifications_rounded,
       label: 'Reminders',
-      route: RemindersScreen.route,
+      route: Routes.reminders,
     ),
   ];
 
@@ -146,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     description: 'View and manage',
                     color: const Color(0xFF0066CC),
                     onTap: () {
-                      Navigator.pushNamed(context, PatientsScreen.route);
+                      Navigator.pushNamed(context, Routes.patients);
                     },
                   ),
                   _ActionCard(
@@ -155,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     description: 'Track prescribed',
                     color: const Color(0xFF00B4D8),
                     onTap: () {
-                      Navigator.pushNamed(context, MedicationsScreen.route);
+                      Navigator.pushNamed(context, Routes.medications);
                     },
                   ),
                   _ActionCard(
@@ -164,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     description: 'Monitor timings',
                     color: const Color(0xFFFF6B6B),
                     onTap: () {
-                      Navigator.pushNamed(context, SchedulesScreen.route);
+                      Navigator.pushNamed(context, Routes.schedules);
                     },
                   ),
                   _ActionCard(
@@ -278,28 +275,28 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 IconButton(
                   onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(context, PatientsScreen.route, (route) => route.isFirst);
+                    Navigator.pushNamedAndRemoveUntil(context, Routes.patients, (route) => route.isFirst);
                   },
                   icon: const Icon(Icons.people),
                   tooltip: 'View Patients',
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(context, MedicationsScreen.route, (route) => route.isFirst);
+                    Navigator.pushNamedAndRemoveUntil(context, Routes.medications, (route) => route.isFirst);
                   },
                   icon: const Icon(Icons.medication_liquid),
                   tooltip: 'View Medications',
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(context, SchedulesScreen.route, (route) => route.isFirst);
+                    Navigator.pushNamedAndRemoveUntil(context, Routes.schedules, (route) => route.isFirst);
                   },
                   icon: const Icon(Icons.schedule),
                   tooltip: 'View Schedules',
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(context, RemindersScreen.route, (route) => route.isFirst);
+                    Navigator.pushNamedAndRemoveUntil(context, Routes.reminders, (route) => route.isFirst);
                   },
                   icon: const Icon(Icons.alarm),
                   tooltip: 'View Reminders',

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/routes.dart';
 import '../../models/patient.dart';
 import 'widgets/patient_card.dart';
-import 'widgets/patient_details_view.dart';
-import 'add_patient_screen.dart';
-import 'widgets/patient_filter.dart';
 
 class PatientsScreen extends StatefulWidget {
   const PatientsScreen({super.key});
@@ -145,7 +143,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
             onPressed: () async {
               final newPatient = await Navigator.pushNamed<Patient>(
                 context,
-                AddPatientScreen.route,
+                Routes.addPatient,
               );
               if (newPatient != null) {
                 _addPatientToList(newPatient);
@@ -418,7 +416,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
   void _navigateToPatientDetails(Patient patient) {
     Navigator.pushNamed(
       context,
-      PatientDetailsView.route,
+      Routes.patientDetails,
       arguments: patient,
     );
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app/features/medications/add_medication_screen.dart';
+import 'package:mobile_app/routes.dart';
 
 import '../../models/medication.dart';
 
@@ -130,7 +130,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamedAndRemoveUntil(context, AddMedicationScreen.route, ModalRoute.withName(MedicationsScreen.route));
+          Navigator.pushNamedAndRemoveUntil(context, Routes.addMedication, ModalRoute.withName(Routes.medications));
         },
         backgroundColor: const Color(0xFF0066CC),
         child: const Icon(Icons.add_rounded),
