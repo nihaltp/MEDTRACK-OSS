@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/routes.dart';
 import 'features/home/home_screen.dart';
-import 'features/patients/patients_screen.dart';
-import 'features/medications/medications_screen.dart';
-import 'features/medications/add_medication_screen.dart';
-import 'features/schedules/schedules_screen.dart';
-import 'features/reminders/reminders_screen.dart';
 import 'theme/app_theme.dart';
 
 class MedTrackApp extends StatelessWidget {
@@ -16,14 +12,7 @@ class MedTrackApp extends StatelessWidget {
       title: 'MedTrack OSS',
       theme: AppTheme.lightTheme,
       initialRoute: HomeScreen.route,
-      routes: {
-        HomeScreen.route: (context) => const HomeScreen(),
-        PatientsScreen.route: (context) => const PatientsScreen(),
-        MedicationsScreen.route: (context) => const MedicationsScreen(),
-        AddMedicationScreen.route: (context) => const AddMedicationScreen(),
-        SchedulesScreen.route: (context) => const SchedulesScreen(),
-        RemindersScreen.route: (context) => const RemindersScreen(),
-      },
+      routes: getRoutes(),
     );
   }
 
