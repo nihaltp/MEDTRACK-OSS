@@ -15,14 +15,14 @@ class MedTrackApp extends StatelessWidget {
     return MaterialApp(
       title: 'MedTrack OSS',
       theme: AppTheme.lightTheme,
-      initialRoute: '/',
+      initialRoute: HomeScreen.route,
       routes: {
-        '/': (context) => const HomeScreen(),
-        '/patients': (context) => const PatientsScreen(),
-        '/medications': (context) => const MedicationsScreen(),
-        '/add_medication': (context) => const AddMedicationScreen(),
-        '/schedules': (context) => const SchedulesScreen(),
-        '/reminders': (context) => const RemindersScreen(),
+        HomeScreen.route: (context) => const HomeScreen(),
+        PatientsScreen.route: (context) => const PatientsScreen(),
+        MedicationsScreen.route: (context) => const MedicationsScreen(),
+        AddMedicationScreen.route: (context) => const AddMedicationScreen(),
+        SchedulesScreen.route: (context) => const SchedulesScreen(),
+        RemindersScreen.route: (context) => const RemindersScreen(),
       },
     );
   }

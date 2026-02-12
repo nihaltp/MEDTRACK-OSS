@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/features/medications/add_medication_screen.dart';
 
 import '../../models/medication.dart';
 
 class MedicationsScreen extends StatefulWidget {
   const MedicationsScreen({super.key});
+  static String route = '/medications';
 
   @override
   State<MedicationsScreen> createState() => _MedicationsScreenState();
@@ -128,7 +130,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamedAndRemoveUntil(context, '/add_medication', ModalRoute.withName('/medications'));
+          Navigator.pushNamedAndRemoveUntil(context, AddMedicationScreen.route, ModalRoute.withName(MedicationsScreen.route));
         },
         backgroundColor: const Color(0xFF0066CC),
         child: const Icon(Icons.add_rounded),
