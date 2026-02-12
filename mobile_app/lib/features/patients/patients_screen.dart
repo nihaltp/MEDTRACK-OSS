@@ -143,11 +143,9 @@ class _PatientsScreenState extends State<PatientsScreen> {
             icon: const Icon(Icons.add_circle_outline),
             color: Theme.of(context).primaryColor,
             onPressed: () async {
-              final newPatient = await Navigator.push<Patient>(
+              final newPatient = await Navigator.pushNamed<Patient>(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const AddPatientScreen(),
-                ),
+                AddPatientScreen.route,
               );
               if (newPatient != null) {
                 _addPatientToList(newPatient);

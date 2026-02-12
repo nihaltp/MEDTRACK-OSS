@@ -16,7 +16,7 @@ class MedTrackApp extends StatelessWidget {
       initialRoute: HomeScreen.route,
       routes: getRoutes(),
       onGenerateRoute: (settings) {
-        if (settings.name == '/patient_details_view') {
+        if (settings.name == PatientDetailsView.route) {
           final patient = settings.arguments as Patient;
           return MaterialPageRoute(
             builder: (context) => PatientDetailsView(patient: patient),
