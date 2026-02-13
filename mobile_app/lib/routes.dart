@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:mobile_app/features/home/home_screen.dart';
 import 'package:mobile_app/features/medications/add_medication_screen.dart';
 import 'package:mobile_app/features/medications/medications_screen.dart';
@@ -24,7 +25,7 @@ class Routes {
   static final String addReminder = AddReminderScreen.route;
 }
 
-getRoutes() {
+Map<String, WidgetBuilder> getRoutes() {
   return {
     Routes.home: (context) => const HomeScreen(),
     Routes.patients: (context) => const PatientsScreen(),
