@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/routes.dart';
+import '../../models/reminder.dart';
 
 class RemindersScreen extends StatefulWidget {
   const RemindersScreen({super.key});
@@ -11,8 +12,8 @@ class RemindersScreen extends StatefulWidget {
 
 class _RemindersScreenState extends State<RemindersScreen> {
   // Mock reminder data
-  final List<_Reminder> reminders = [
-    _Reminder(
+  final List<Reminder> reminders = [
+    Reminder(
       id: 1,
       medication: 'Lisinopril',
       patient: 'John Doe',
@@ -22,7 +23,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
       notificationCount: 3,
       icon: '📱',
     ),
-    _Reminder(
+    Reminder(
       id: 2,
       medication: 'Metformin',
       patient: 'John Doe',
@@ -32,7 +33,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
       notificationCount: 2,
       icon: '🔔',
     ),
-    _Reminder(
+    Reminder(
       id: 3,
       medication: 'Atorvastatin',
       patient: 'Jane Smith',
@@ -42,7 +43,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
       notificationCount: 0,
       icon: '🌙',
     ),
-    _Reminder(
+    Reminder(
       id: 4,
       medication: 'Aspirin',
       patient: 'Michael Johnson',
@@ -52,7 +53,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
       notificationCount: 1,
       icon: '⏰',
     ),
-    _Reminder(
+    Reminder(
       id: 5,
       medication: 'Blood Pressure Check',
       patient: 'John Doe',
@@ -113,11 +114,16 @@ class _RemindersScreenState extends State<RemindersScreen> {
               },
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(
+        onPressed: () async {
+          final result = await Navigator.pushNamed(
             context,
             Routes.addReminder,
           );
+          if (result != null && result is Reminder) {
+            setState(() {
+              reminders.add(result);
+            });
+          }
         },
         backgroundColor: const Color(0xFF0066CC),
         child: const Icon(Icons.add_rounded),
@@ -126,30 +132,8 @@ class _RemindersScreenState extends State<RemindersScreen> {
   }
 }
 
-class _Reminder {
-  final int id;
-  final String medication;
-  final String patient;
-  final String scheduledTime;
-  final String type;
-  final bool isEnabled;
-  final int notificationCount;
-  final String icon;
-
-  _Reminder({
-    required this.id,
-    required this.medication,
-    required this.patient,
-    required this.scheduledTime,
-    required this.type,
-    required this.isEnabled,
-    required this.notificationCount,
-    required this.icon,
-  });
-}
-
 class _ReminderCard extends StatefulWidget {
-  final _Reminder reminder;
+  final Reminder reminder;
 
   const _ReminderCard({required this.reminder});
 

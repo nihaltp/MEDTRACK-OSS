@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../models/reminder.dart';
+import '../../routes.dart';
+
 class AddReminderScreen extends StatefulWidget {
   const AddReminderScreen({super.key});
   static const String route = '/add_reminder';
@@ -17,6 +20,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
   List<String> _type = ['Morning', 'Afternoon', 'Evening', 'Weekly'];
   bool _isEnabled = true;
   int _notificationCount = 1;
+  int id = 5;
   String? _selectedType;
 
   @override
@@ -273,7 +277,17 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                           if (_formKey.currentState!.validate() &&
                               _selectedType != null) {
                             _formKey.currentState!.save();
-                            Navigator.pop(context);
+                            final newReminder = Reminder(
+                              id: DateTime.now().millisecondsSinceEpoch,
+                              medication: _medicationName,
+                              patient: _patientName,
+                              scheduledTime: _scheduledTime.format(context),
+                              type: _selectedType!,
+                              isEnabled: _isEnabled,
+                              notificationCount: _notificationCount,
+                            );
+
+                            Navigator.pop(context, newReminder);
                           }
                         },
                         child: Text("Add Reminder"),
