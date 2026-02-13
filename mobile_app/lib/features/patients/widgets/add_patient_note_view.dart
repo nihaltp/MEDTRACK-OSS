@@ -3,7 +3,7 @@ import '../../../models/patient.dart';
 
 class AddPatientNoteView extends StatefulWidget {
   final Patient patient;
-
+  static String route = '/add-patient-note';
   const AddPatientNoteView({super.key, required this.patient});
 
   @override

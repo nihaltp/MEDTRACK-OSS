@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/routes.dart';
 import '../../models/patient.dart';
 import 'widgets/patient_card.dart';
-import 'widgets/patient_details_view.dart';
 
 class ProfessionalPatientsScreen extends StatefulWidget {
   const ProfessionalPatientsScreen({super.key});
@@ -127,11 +127,10 @@ class _ProfessionalPatientsScreenState extends State<ProfessionalPatientsScreen>
   }
 
   void _navigateToPatientDetails(Patient patient) {
-    Navigator.push(
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (_) => PatientDetailsView(patient: patient),
-      ),
+      Routes.patientDetails,
+      arguments: patient,
     );
   }
 }

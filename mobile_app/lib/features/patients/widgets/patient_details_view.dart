@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/routes.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../models/patient.dart';
-import '../../schedules/schedule_appointment_view.dart';
-import 'add_patient_note_view.dart';
 
 class PatientDetailsView extends StatelessWidget {
   final Patient patient;
@@ -213,19 +212,17 @@ class PatientDetailsView extends StatelessWidget {
             sendSms(patient.phoneNumber);
           }),
           _buildActionButton(context, Icons.calendar_today, 'Schedule', Colors.purple, onTap: () {
-            Navigator.push(
+            Navigator.pushNamed(
               context,
-              MaterialPageRoute(
-                builder: (context) => ScheduleAppointmentView(patient: patient),
-              ),
+              Routes.scheduleAppointment,
+              arguments: patient,
             );
           }),
           _buildActionButton(context, Icons.note_add, 'Add Note', Colors.orange, onTap: () {
-            Navigator.push(
+            Navigator.pushNamed(
               context,
-              MaterialPageRoute(
-                builder: (context) => AddPatientNoteView(patient: patient),
-              ),
+              Routes.addPatientNote,
+              arguments: patient,
             );
           }),
         ],

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app/features/reminders/add_reminder_screen.dart';
+import 'package:mobile_app/routes.dart';
 
 class RemindersScreen extends StatefulWidget {
   const RemindersScreen({super.key});
@@ -114,11 +114,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
+          Navigator.pushNamed(
             context,
-            MaterialPageRoute(
-              builder: (context) => const AddReminderScreen(),
-            ),
+            Routes.addReminder,
           );
         },
         backgroundColor: const Color(0xFF0066CC),
