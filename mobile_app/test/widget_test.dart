@@ -91,7 +91,29 @@ void main() {
     'adding patient clears active search so new row is visible',
     (WidgetTester tester) async {
       await _setLargeTestSurface(tester);
-      await tester.pumpWidget(const MaterialApp(home: PatientsScreen()));
+      await tester.pumpWidget(
+        MaterialApp(
+          routes: getRoutes(),
+          onGenerateRoute: (settings) {
+            if (settings.name == Routes.addPatient) {
+              return MaterialPageRoute<Patient>(
+                builder: (context) => const AddPatientScreen(),
+              );
+            }
+            if (settings.name == Routes.patientDetails) {
+              if (settings.arguments is !Patient) {
+                return null;
+              }
+              final patient = settings.arguments as Patient;
+              return MaterialPageRoute(
+                builder: (context) => PatientDetailsView(patient: patient),
+              );
+            }
+            return null;
+          },
+          initialRoute: Routes.patients,
+        )
+      );
 
       await tester.enterText(
         find.byType(TextField),
