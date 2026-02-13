@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/patient.dart';
 
 class ScheduleAppointmentView extends StatefulWidget {
-  static String route = '/schedule-appointment';
+  static String route = '/schedule_appointment';
   final Patient patient;
 
   const ScheduleAppointmentView({super.key, required this.patient});
