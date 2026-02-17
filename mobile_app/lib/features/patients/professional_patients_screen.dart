@@ -67,14 +67,37 @@ class _ProfessionalPatientsScreenState extends State<ProfessionalPatientsScreen>
 
   String _searchQuery = '';
   String _statusFilter = 'All';
+  String? _selectedGender;
+  String? _selectedCondition;
+  String _sortBy = 'Name';
+
+  List<String> get _availableGenders => _patients.map((p) => p.gender).toSet().toList()..sort();
+  List<String> get _availableConditions => _patients.map((p) => p.condition).toSet().toList()..sort();
 
   List<Patient> get _filteredPatients {
-    return _patients.where((p) {
+    var filtered = _patients.where((p) {
       final matchesQuery = p.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           p.condition.toLowerCase().contains(_searchQuery.toLowerCase());
       final matchesStatus = _statusFilter == 'All' || p.status == _statusFilter;
-      return matchesQuery && matchesStatus;
+      final matchesGender = _selectedGender == null || p.gender == _selectedGender;
+      final matchesCondition = _selectedCondition == null || p.condition == _selectedCondition;
+      
+      return matchesQuery && matchesStatus && matchesGender && matchesCondition;
     }).toList();
+
+    switch (_sortBy) {
+      case 'Name':
+        filtered.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      case 'Age':
+        filtered.sort((a, b) => a.age.compareTo(b.age));
+        break;
+      case 'Last Visit':
+        filtered.sort((a, b) => b.lastVisit.compareTo(a.lastVisit));
+        break;
+    }
+    
+    return filtered;
   }
 
   final List<String> _statusOptions = ['All', 'Stable', 'Recovering', 'Critical'];
@@ -88,11 +111,23 @@ class _ProfessionalPatientsScreenState extends State<ProfessionalPatientsScreen>
         elevation: 1,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.filter_list,
+              color: (_selectedGender != null || _selectedCondition != null) 
+                  ? Colors.blueAccent 
+                  : Colors.grey[700],
+            ),
+            onPressed: _openFilterSheet,
+          ),
+        ],
       ),
       body: Column(
         children: [
           _buildSearchBar(),
           _buildFilterChips(),
+          if (_selectedGender != null || _selectedCondition != null) _buildActiveFilters(),
           Expanded(
             child: _filteredPatients.isEmpty
                 ? _buildEmptyState()
@@ -139,6 +174,43 @@ class _ProfessionalPatientsScreenState extends State<ProfessionalPatientsScreen>
     );
   }
 
+  Widget _buildActiveFilters() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        children: [
+          if (_selectedGender != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: InputChip(
+                label: Text('Gender: $_selectedGender'),
+                onDeleted: () => setState(() => _selectedGender = null),
+                backgroundColor: Colors.blue.withOpacity(0.1),
+                deleteIconColor: Colors.blue,
+              ),
+            ),
+          if (_selectedCondition != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: InputChip(
+                label: Text('Condition: $_selectedCondition'),
+                onDeleted: () => setState(() => _selectedCondition = null),
+                backgroundColor: Colors.blue.withOpacity(0.1),
+                deleteIconColor: Colors.blue,
+              ),
+            ),
+          TextButton(
+             onPressed: () => setState(() {
+               _selectedGender = null;
+               _selectedCondition = null;
+             }),
+             child: const Text('Clear All'),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _buildFilterChips() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -181,6 +253,146 @@ class _ProfessionalPatientsScreenState extends State<ProfessionalPatientsScreen>
       context,
       Routes.patientDetails,
       arguments: patient,
+    );
+  }
+
+  void _openFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                left: 20,
+                right: 20,
+                top: 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Filter & Sort',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setModalState(() {
+                            _selectedGender = null;
+                            _selectedCondition = null;
+                            _sortBy = 'Name';
+                          });
+                          setState(() {}); // Update main screen
+                        },
+                        child: const Text('Reset'),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  const SizedBox(height: 10),
+                  
+                  // Sort By
+                  Text(
+                    'Sort By',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: ['Name', 'Age', 'Last Visit'].map((sort) {
+                      final selected = _sortBy == sort;
+                      return ChoiceChip(
+                        label: Text(sort),
+                        selected: selected,
+                        onSelected: (_) {
+                          setModalState(() => _sortBy = sort);
+                          setState(() {});
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Gender Filter
+                  DropdownButtonFormField<String>(
+                    value: _selectedGender,
+                    decoration: InputDecoration(
+                      labelText: 'Gender',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                    items: [
+                      const DropdownMenuItem(value: null, child: Text('All Genders')),
+                      ..._availableGenders.map((g) => DropdownMenuItem(
+                            value: g,
+                            child: Text(g),
+                          ))
+                    ],
+                    onChanged: (value) {
+                      setModalState(() => _selectedGender = value);
+                      setState(() {});
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Condition Filter
+                  DropdownButtonFormField<String>(
+                    value: _selectedCondition,
+                    decoration: InputDecoration(
+                      labelText: 'Condition',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                     items: [
+                      const DropdownMenuItem(value: null, child: Text('All Conditions')),
+                      ..._availableConditions.map((c) => DropdownMenuItem(
+                            value: c,
+                            child: Text(c, overflow: TextOverflow.ellipsis),
+                          ))
+                    ],
+                    onChanged: (value) {
+                      setModalState(() => _selectedCondition = value);
+                      setState(() {});
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Apply'),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
