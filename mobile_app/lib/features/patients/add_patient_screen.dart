@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import '../../models/patient.dart';
 
 class AddPatientScreen extends StatefulWidget {
-  const AddPatientScreen({super.key});
+  final Patient? existingPatient; // Optional for editing
+  const AddPatientScreen({
+    super.key,
+    this.existingPatient
+  });
   static const String route = '/add_patient';
 
   @override
@@ -10,6 +14,8 @@ class AddPatientScreen extends StatefulWidget {
 }
 
 class _AddPatientScreenState extends State<AddPatientScreen> {
+  bool get isEditing => widget.existingPatient != null;
+
   final _formKey = GlobalKey<FormState>();
   String _name = '';
   int _age = 0;
@@ -22,6 +28,19 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
   final FocusNode _genderFocusNode = FocusNode();
   bool _isStatusFocused = false; // Tracking focus for status box
   final FocusNode _statusFocusNode = FocusNode(); // Unique node for status
+
+  @override
+  void initState() {
+    super.initState();
+    if (isEditing) {
+      final patient = widget.existingPatient!;
+      _name = patient.name;
+      _age = patient.age;
+      _gender = patient.gender;
+      _condition = patient.condition;
+      _status = patient.status;
+    }
+  }
 
   String _generatePatientId() {
     return 'P${DateTime.now().millisecondsSinceEpoch}';
@@ -41,7 +60,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text("Add New Patient")),
+        appBar: AppBar(title: Text(isEditing ? "Edit Patient" : "Add New Patient")),
         body: Padding(
           padding: EdgeInsets.all(20),
           child: Form(
@@ -50,6 +69,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
               child: Column(
                 children: [
                 TextFormField(
+                  initialValue: _name,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Please Enter Patient's Name";
@@ -88,6 +108,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                 ),
                 SizedBox(height: 15),
                 TextFormField(
+                  initialValue: _age.toString(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Please Enter Patient's Age";
@@ -188,6 +209,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                 ),
                 SizedBox(height: 15),
                 TextFormField(
+                  initialValue: _condition,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Please Enter Patient's Condition";
@@ -305,6 +327,20 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           _gender.isNotEmpty &&
                           _status.isNotEmpty) {
                         _formKey.currentState!.save();
+                        if (isEditing) {
+                          final updatedPatient = Patient(
+                            id: widget.existingPatient!.id,
+                            name: _name,
+                            age: _age,
+                            gender: _gender,
+                            condition: _condition,
+                            status: _status,
+                            lastVisit: widget.existingPatient!.lastVisit,
+                            phoneNumber: widget.existingPatient!.phoneNumber,
+                          );
+                          Navigator.pop(context, updatedPatient);
+                          return;
+                        }
                         final newPatient = Patient(
                           id: _generatePatientId(),
                           name: _name,
@@ -317,7 +353,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                         Navigator.pop(context, newPatient);
                       }
                     },
-                    child: Text("Add Patient️"),
+                    child: Text(isEditing ? "Update Patient" : "Add Patient"),
                   ),
                 ],
               ),

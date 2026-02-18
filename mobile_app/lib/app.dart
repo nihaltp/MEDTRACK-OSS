@@ -28,6 +28,12 @@ class MedTrackApp extends StatelessWidget {
           return MaterialPageRoute(builder: (context) => _errorScreen());
         }
         if (settings.name == Routes.addPatient) {
+          if (settings.arguments is Patient) {
+            final patient = settings.arguments as Patient;
+            return MaterialPageRoute(
+              builder: (context) => AddPatientScreen(existingPatient: patient),
+            );
+          }
           return MaterialPageRoute<Patient>(
             builder: (context) => const AddPatientScreen(),
           );

@@ -3,11 +3,24 @@ import 'package:mobile_app/routes.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../models/patient.dart';
 
-class PatientDetailsView extends StatelessWidget {
+class PatientDetailsView extends StatefulWidget {
   final Patient patient;
   static const String route = '/patient_details_view';
 
   const PatientDetailsView({super.key, required this.patient});
+
+  @override
+  State<PatientDetailsView> createState() => _PatientDetailsViewState();
+}
+
+class _PatientDetailsViewState extends State<PatientDetailsView> {
+  late Patient _currentPatient;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPatient = widget.patient;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,12 +28,26 @@ class PatientDetailsView extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).maybePop(),
+          onPressed: () => Navigator.pop(context, _currentPatient),
           tooltip: 'Back',
         ),
         title: const Text('Patient Profile'),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+          IconButton(
+            onPressed: () async {
+              final result = await Navigator.pushNamed(
+                context,
+                Routes.addPatient,
+                arguments: _currentPatient,
+              );
+              if (result is Patient) {
+                setState(() {
+                  _currentPatient = result;
+                });
+              }
+            },
+            icon: const Icon(Icons.edit),
+          ),
           IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
         ],
       ),
@@ -53,12 +80,12 @@ class PatientDetailsView extends StatelessWidget {
       child: Column(
         children: [
           Hero(
-            tag: 'avatar_${patient.id}',
+            tag: 'avatar_${_currentPatient.id}',
             child: CircleAvatar(
               radius: 40,
               backgroundColor: Theme.of(context).primaryColor,
               child: Text(
-                patient.name.substring(0, 1).toUpperCase(),
+                _currentPatient.name.substring(0, 1).toUpperCase(),
                 style: Theme.of(context).textTheme.displaySmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -68,14 +95,14 @@ class PatientDetailsView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            patient.name,
+            _currentPatient.name,
             style: Theme.of(
               context,
             ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            'ID: ${patient.id}',
+            'ID: ${_currentPatient.id}',
             style: Theme.of(
               context,
             ).textTheme.bodyLarge?.copyWith(color: Colors.grey[800]),
@@ -84,9 +111,9 @@ class PatientDetailsView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildBadges(context, patient.gender, Icons.person),
+              _buildBadges(context, _currentPatient.gender, Icons.person),
               const SizedBox(width: 12),
-              _buildBadges(context, '${patient.age} Years', Icons.cake),
+              _buildBadges(context, '${_currentPatient.age} Years', Icons.cake),
             ],
           ),
         ],
@@ -206,23 +233,23 @@ class PatientDetailsView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildActionButton(context, Icons.call, 'Call', Colors.green,onTap: (){
-            makePhoneCall(patient.phoneNumber);
+            makePhoneCall(_currentPatient.phoneNumber);
           }),
           _buildActionButton(context, Icons.message, 'Message', Colors.blue, onTap: () {
-            sendSms(patient.phoneNumber);
+            sendSms(_currentPatient.phoneNumber);
           }),
           _buildActionButton(context, Icons.calendar_today, 'Schedule', Colors.purple, onTap: () {
             Navigator.pushNamed(
               context,
               Routes.scheduleAppointment,
-              arguments: patient,
+              arguments: _currentPatient,
             );
           }),
           _buildActionButton(context, Icons.note_add, 'Add Note', Colors.orange, onTap: () {
             Navigator.pushNamed(
               context,
               Routes.addPatientNote,
-              arguments: patient,
+              arguments: _currentPatient,
             );
           }),
         ],

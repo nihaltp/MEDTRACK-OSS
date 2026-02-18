@@ -413,11 +413,20 @@ class _PatientsScreenState extends State<PatientsScreen> {
     );
   }
 
-  void _navigateToPatientDetails(Patient patient) {
-    Navigator.pushNamed(
+  Future<void> _navigateToPatientDetails(Patient patient) async {
+    final updatedPatient = await Navigator.pushNamed(
       context,
       Routes.patientDetails,
       arguments: patient,
     );
+
+    if (updatedPatient != null && updatedPatient is Patient) {
+      setState(() {
+        final index = _patients.indexWhere((p) => p.id == updatedPatient.id);
+        if (index != -1) {
+          _patients[index] = updatedPatient;
+        }
+      });
+    }
   }
 }

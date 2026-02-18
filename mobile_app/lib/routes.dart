@@ -38,6 +38,5 @@ Map<String, WidgetBuilder> getRoutes() {
     Routes.schedules: (context) => const SchedulesScreen(),
     Routes.reminders: (context) => const RemindersScreen(),
     Routes.addReminder: (context) => const AddReminderScreen(),
-    Routes.addPatient: (context) => const AddPatientScreen(),
   };
 }
