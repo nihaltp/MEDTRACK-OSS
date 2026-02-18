@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/routes.dart';
 import '../../models/patient.dart';
 import 'widgets/patient_card.dart';
+import '../../models/appointment.dart';
+import 'package:uuid/uuid.dart';
 
 class ProfessionalPatientsScreen extends StatefulWidget {
   const ProfessionalPatientsScreen({super.key});
@@ -22,6 +24,16 @@ class _ProfessionalPatientsScreenState extends State<ProfessionalPatientsScreen>
       status: 'Stable',
       lastVisit: DateTime.now().subtract(const Duration(days: 2)),
       phoneNumber: '+91 98765 43210',
+      appointments: [
+        Appointment(
+          id: const Uuid().v4(),
+          patientId: 'P001',
+          date: DateTime.now().add(const Duration(days: 2)),
+          time: const TimeOfDay(hour: 10, minute: 30),
+          type: 'Follow-up',
+          notes: 'Regular checkup for hypertension',
+        ),
+      ],
     ),
     Patient(
       id: 'P002',
@@ -254,17 +266,24 @@ class _ProfessionalPatientsScreenState extends State<ProfessionalPatientsScreen>
   }
 
   Future<void> _navigateToPatientDetails(Patient patient) async {
-    final updatedPatient = await Navigator.pushNamed(
+    final result = await Navigator.pushNamed(
       context,
       Routes.patientDetails,
       arguments: patient,
     );
 
-    if (updatedPatient != null && updatedPatient is Patient) {
+    if (result == 'delete') {
       setState(() {
-        final index = _patients.indexWhere((p) => p.id == updatedPatient.id);
+        _patients.removeWhere((p) => p.id == patient.id);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${patient.name} deleted')),
+      );
+    } else if (result != null && result is Patient) {
+      setState(() {
+        final index = _patients.indexWhere((p) => p.id == result.id);
         if (index != -1) {
-          _patients[index] = updatedPatient;
+          _patients[index] = result;
         }
       });
     }
