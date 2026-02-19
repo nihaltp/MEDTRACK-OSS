@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../models/patient.dart';
 
 class AddPatientScreen extends StatefulWidget {
+  final Patient? patient;
+  const AddPatientScreen({super.key, this.patient});
   final Patient? existingPatient; // Optional for editing
   const AddPatientScreen({
     super.key,
@@ -17,11 +19,11 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
   bool get isEditing => widget.existingPatient != null;
 
   final _formKey = GlobalKey<FormState>();
-  String _name = '';
-  int _age = 0;
-  String _condition = '';
-  String _gender = '';
-  String _status = 'Stable';
+  late String _name;
+  late int _age;
+  late String _condition;
+  late String _gender;
+  late String _status;
   bool _isGenderFocused = false;
   String? _genderError;
   String? _statusError;
@@ -32,6 +34,11 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
   @override
   void initState() {
     super.initState();
+    _name = widget.patient?.name ?? '';
+    _age = widget.patient?.age ?? 0;
+    _condition = widget.patient?.condition ?? '';
+    _gender = widget.patient?.gender ?? '';
+    _status = widget.patient?.status ?? 'Stable';
     if (isEditing) {
       final patient = widget.existingPatient!;
       _name = patient.name;
@@ -43,7 +50,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
   }
 
   String _generatePatientId() {
-    return 'P${DateTime.now().millisecondsSinceEpoch}';
+    return widget.patient?.id ?? 'P${DateTime.now().millisecondsSinceEpoch}';
   }
 
   @override
@@ -60,6 +67,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
+        appBar: AppBar(title: Text(widget.patient == null ? "Add New Patient" : "Edit Patient")),
         appBar: AppBar(title: Text(isEditing ? "Edit Patient" : "Add New Patient")),
         body: Padding(
           padding: EdgeInsets.all(20),
@@ -108,6 +116,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                 ),
                 SizedBox(height: 15),
                 TextFormField(
+                  initialValue: _age == 0 ? '' : _age.toString(),
                   initialValue: _age.toString(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -188,7 +197,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                         RadioListTile<String>(
                           title: const Text('Male'),
                           value: 'Male',
-                          groupValue: _gender,
+                          groupValue: _gender.isNotEmpty ? _gender : null,
                           onChanged: (value) => setState(() {
                             _gender = value!;
                             _genderFocusNode.requestFocus();
@@ -197,7 +206,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                         RadioListTile<String>(
                           title: const Text('Female'),
                           value: 'Female',
-                          groupValue: _gender,
+                          groupValue: _gender.isNotEmpty ? _gender : null,
                           onChanged: (value) => setState(() {
                             _gender = value!;
                             _genderFocusNode.requestFocus();
@@ -276,7 +285,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                         RadioListTile<String>(
                           title: const Text('Stable'),
                           value: 'Stable',
-                          groupValue: _status,
+                          groupValue: _status.isNotEmpty ? _status : null,
                           onChanged: (value) => setState(() {
                             _status = value!;
                             _statusFocusNode.requestFocus();
@@ -285,7 +294,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                         RadioListTile<String>(
                           title: const Text('Critical'),
                           value: 'Critical',
-                          groupValue: _status,
+                          groupValue: _status.isNotEmpty ? _status : null,
                           onChanged: (value) => setState(() {
                             _status = value!;
                             _statusFocusNode.requestFocus();
@@ -294,7 +303,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                         RadioListTile<String>(
                           title: const Text('Recovering'),
                           value: 'Recovering',
-                          groupValue: _status,
+                          groupValue: _status.isNotEmpty ? _status : null,
                           onChanged: (value) => setState(() {
                             _status = value!;
                             _statusFocusNode.requestFocus();
@@ -348,11 +357,13 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           gender: _gender,
                           condition: _condition,
                           status: _status,
-                          lastVisit: DateTime.now(),
+                          lastVisit: widget.patient?.lastVisit ?? DateTime.now(),
+                          phoneNumber: widget.patient?.phoneNumber ?? 'N/A',
                         );
                         Navigator.pop(context, newPatient);
                       }
                     },
+                    child: Text(widget.patient == null ? "Add Patient️" : "Save Changes"),
                     child: Text(isEditing ? "Update Patient" : "Add Patient"),
                   ),
                 ],

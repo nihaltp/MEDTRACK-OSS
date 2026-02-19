@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/patient.dart';
+import '../../models/appointment.dart';
+import 'package:uuid/uuid.dart';
 
 class ScheduleAppointmentView extends StatefulWidget {
   static const String route = '/schedule_appointment';
@@ -215,11 +217,19 @@ class _ScheduleAppointmentViewState extends State<ScheduleAppointmentView> {
         return;
       }
 
-      // Here you would typically save the appointment to a database
+      final newAppointment = Appointment(
+        id: const Uuid().v4(),
+        patientId: widget.patient.id,
+        date: _selectedDate!,
+        time: _selectedTime!,
+        type: _selectedType,
+        notes: _noteController.text.isEmpty ? null : _noteController.text,
+      );
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Appointment Scheduled Successfully')),
       );
-      Navigator.pop(context);
+      Navigator.pop(context, newAppointment);
     }
   }
 }

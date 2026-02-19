@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/patient.dart';
+import '../../../models/patient_note.dart';
+import 'package:uuid/uuid.dart';
 
 class AddPatientNoteView extends StatefulWidget {
   final Patient patient;
@@ -157,11 +159,19 @@ class _AddPatientNoteViewState extends State<AddPatientNoteView> {
 
   void _saveNote() {
     if (_formKey.currentState!.validate()) {
-      // Here you would typically save the note to a database
+      final newNote = PatientNote(
+        id: const Uuid().v4(),
+        patientId: widget.patient.id,
+        title: _titleController.text,
+        content: _noteController.text,
+        category: _selectedCategory,
+        date: DateTime.now(),
+      );
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Note Saved Successfully')),
       );
-      Navigator.pop(context);
+      Navigator.pop(context, newNote);
     }
   }
 }

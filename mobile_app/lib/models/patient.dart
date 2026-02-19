@@ -1,3 +1,6 @@
+import 'appointment.dart';
+import 'patient_note.dart';
+
 class Patient {
   final String id;
   final String name;
@@ -7,6 +10,8 @@ class Patient {
   final String status; // e.g., "Critical", "Stable", "Recovering"
   final DateTime lastVisit;
   final String phoneNumber;
+  final List<Appointment> appointments;
+  final List<PatientNote> notes;
 
   Patient({
     required this.id,
@@ -17,6 +22,8 @@ class Patient {
     this.status = 'Stable',
     required this.lastVisit,
     this.phoneNumber = 'N/A',
+    this.appointments = const [],
+    this.notes = const [],
   });
 
   factory Patient.fromJson(Map<String, dynamic> json) {
@@ -29,6 +36,12 @@ class Patient {
       status: json['status'] as String? ?? 'Stable',
       lastVisit: DateTime.parse(json['lastVisit'] as String),
       phoneNumber: json['phoneNumber'] as String? ?? 'N/A',
+      appointments: (json['appointments'] as List<dynamic>?)
+          ?.map((e) => Appointment.fromJson(e as Map<String, dynamic>))
+          .toList() ?? [],
+      notes: (json['notes'] as List<dynamic>?)
+          ?.map((e) => PatientNote.fromJson(e as Map<String, dynamic>))
+          .toList() ?? [],
     );
   }
 
@@ -42,6 +55,8 @@ class Patient {
       'status': status,
       'lastVisit': lastVisit.toIso8601String(),
       'phoneNumber': phoneNumber,
+      'appointments': appointments.map((e) => e.toJson()).toList(),
+      'notes': notes.map((e) => e.toJson()).toList(),
     };
   }
 }
