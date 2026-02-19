@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/models/medication.dart';
+import 'dart:math';
 
 class AddMedicationScreen extends StatefulWidget {
   const AddMedicationScreen({super.key});
@@ -10,8 +12,32 @@ class AddMedicationScreen extends StatefulWidget {
 
 class _AddMedicationScreenState extends State<AddMedicationScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _dosageController = TextEditingController();
+  final _frequencyController = TextEditingController();
+  final _purposeController = TextEditingController();
+  final _iconController = TextEditingController();
+
   List<bool> selectedDays = [true, true, true, true, true, true, true];
-  List<String> days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  List<String> days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _dosageController.dispose();
+    _frequencyController.dispose();
+    _purposeController.dispose();
+    _iconController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +53,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
             child: Column(
               children: [
                 TextFormField(
+                  controller: _nameController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a medication name';
@@ -44,6 +71,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  controller: _dosageController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a dosage';
@@ -61,6 +89,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  controller: _frequencyController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the frequency';
@@ -78,6 +107,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  controller: _purposeController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the purpose';
@@ -95,13 +125,14 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  controller: _iconController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     filled: true,
                     fillColor: Colors.grey[100],
-                    hintText: 'Enter an Icon',
+                    hintText: 'Enter an Icon (e.g. 💊, 💉)',
                   ),
                 ),
                 SizedBox(height: 32),
@@ -121,9 +152,10 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                             children: [
                               Icon(
                                 Icons.circle,
-                                color: selectedDays[i]
-                                ? Colors.greenAccent
-                                : Colors.grey.shade200,
+                                color:
+                                    selectedDays[i]
+                                        ? Colors.greenAccent
+                                        : Colors.grey.shade200,
                                 size: 30,
                                 semanticLabel: days[i],
                               ),
@@ -133,8 +165,8 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                                   color: Colors.black,
                                   fontSize: 12,
                                 ),
-                              )
-                            ]
+                              ),
+                            ],
                           ),
                           onTap: () {
                             setState(() {
@@ -142,13 +174,13 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                             });
                           },
                         ),
-                    ]
+                    ],
                   ),
                 ),
               ],
-            )
-          )
-        )
+            ),
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -159,13 +191,28 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
               );
               return;
             }
-            Navigator.pop(context);
+
+            final newMedication = Medication(
+              id: Random().nextInt(100000), // Simple random ID
+              name: _nameController.text,
+              dosage: _dosageController.text,
+              frequency: _frequencyController.text,
+              frequencyWeekly: selectedDays,
+              purpose: _purposeController.text,
+              icon:
+                  _iconController.text.isNotEmpty ? _iconController.text : '💊',
+              color: Colors.primaries[Random().nextInt(
+                Colors.primaries.length,
+              )], // Random color
+              nextDue: 'Scheduled', // Default value
+              isActive: true,
+            );
+
+            Navigator.pop(context, newMedication);
           }
         },
         backgroundColor: Colors.greenAccent,
-        child: const Icon(
-          Icons.check,
-        ),
+        child: const Icon(Icons.check),
       ),
     );
   }

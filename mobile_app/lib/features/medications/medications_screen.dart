@@ -129,8 +129,27 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamedAndRemoveUntil(context, Routes.addMedication, ModalRoute.withName(Routes.medications));
+        onPressed: () async {
+          final result = await Navigator.pushNamed(
+            context,
+            Routes.addMedication,
+          );
+
+          if (result != null && result is Medication) {
+            setState(() {
+              medications.add(result);
+              // Reset filter to 'All' or 'Active' to ensure the new med is visible if it matches
+              if (_filterValue == 'Inactive') {
+                _filterValue = 'All';
+              }
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${result.name} added successfully'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
         },
         backgroundColor: const Color(0xFF0066CC),
         child: const Icon(Icons.add_rounded),
