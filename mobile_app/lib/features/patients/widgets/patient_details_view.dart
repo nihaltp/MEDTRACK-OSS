@@ -422,6 +422,7 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
     );
   }
 
+  Widget _buildNotesList(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
