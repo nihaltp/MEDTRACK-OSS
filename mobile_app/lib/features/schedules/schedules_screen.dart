@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/models/schedule_entry.dart';
 
 class SchedulesScreen extends StatefulWidget {
   const SchedulesScreen({super.key});
@@ -10,8 +11,8 @@ class SchedulesScreen extends StatefulWidget {
 
 class _SchedulesScreenState extends State<SchedulesScreen> {
   // Mock schedule data
-  final List<_ScheduleEntry> schedules = [
-    _ScheduleEntry(
+  final List<ScheduleEntry> schedules = [
+    ScheduleEntry(
       medication: 'Lisinopril',
       dosage: '10 mg',
       time: '08:00 AM',
@@ -20,7 +21,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       statusColor: const Color(0xFF4CAF50),
       icon: '💊',
     ),
-    _ScheduleEntry(
+    ScheduleEntry(
       medication: 'Metformin',
       dosage: '500 mg',
       time: '12:30 PM',
@@ -29,7 +30,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       statusColor: const Color(0xFFFFC107),
       icon: '💉',
     ),
-    _ScheduleEntry(
+    ScheduleEntry(
       medication: 'Lisinopril',
       dosage: '10 mg',
       time: '08:00 PM',
@@ -38,7 +39,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       statusColor: const Color(0xFF00B4D8),
       icon: '💊',
     ),
-    _ScheduleEntry(
+    ScheduleEntry(
       medication: 'Atorvastatin',
       dosage: '20 mg',
       time: '09:00 PM',
@@ -47,7 +48,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       statusColor: const Color(0xFF4CAF50),
       icon: '⚕️',
     ),
-    _ScheduleEntry(
+    ScheduleEntry(
       medication: 'Aspirin',
       dosage: '81 mg',
       time: 'Tomorrow 08:00 AM',
@@ -136,26 +137,6 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
   }
 }
 
-class _ScheduleEntry {
-  final String medication;
-  final String dosage;
-  final String time;
-  final String patient;
-  final String status;
-  final Color statusColor;
-  final String icon;
-
-  _ScheduleEntry({
-    required this.medication,
-    required this.dosage,
-    required this.time,
-    required this.patient,
-    required this.status,
-    required this.statusColor,
-    required this.icon,
-  });
-}
-
 class _StatusChip extends StatelessWidget {
   final String label;
   final bool isActive;
@@ -196,7 +177,7 @@ class _StatusChip extends StatelessWidget {
 }
 
 class _ScheduleCard extends StatelessWidget {
-  final _ScheduleEntry schedule;
+  final ScheduleEntry schedule;
 
   const _ScheduleCard({required this.schedule});
 
@@ -259,7 +240,8 @@ class _ScheduleCard extends StatelessWidget {
                     color: schedule.statusColor.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   child: Text(
                     schedule.status,
                     style: TextStyle(
@@ -317,7 +299,8 @@ class _ScheduleCard extends StatelessWidget {
                 ? ElevatedButton.icon(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Medication marked as taken!')),
+                        const SnackBar(
+                            content: Text('Medication marked as taken!')),
                       );
                     },
                     icon: const Icon(Icons.check_circle_rounded, size: 18),
