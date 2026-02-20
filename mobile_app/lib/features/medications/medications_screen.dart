@@ -132,10 +132,10 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        heroTag: 'medication_fab',
         onPressed: () async {
           await _newMedication(context);
         },
+        heroTag: 'add_medication_fab',
         backgroundColor: const Color(0xFF0066CC),
         child: const Icon(Icons.add_rounded),
       ),

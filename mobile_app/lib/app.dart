@@ -6,6 +6,7 @@ import 'package:mobile_app/features/patients/widgets/patient_details_view.dart';
 import 'package:mobile_app/features/schedules/schedule_appointment_view.dart';
 import 'package:mobile_app/models/medication.dart';
 import 'package:mobile_app/models/patient.dart';
+import 'package:mobile_app/models/patient_note.dart';
 import 'package:mobile_app/routes.dart';
 import 'theme/app_theme.dart';
 
@@ -51,9 +52,8 @@ class MedTrackApp extends StatelessWidget {
             final patient = args['patient'] as Patient;
             final note = args['note'] as PatientNote?;
             return MaterialPageRoute(
-              builder:
-                  (context) =>
-                      AddPatientNoteView(patient: patient, noteToEdit: note),
+              builder: (context) =>
+                  AddPatientNoteView(patient: patient, noteToEdit: note),
             );
           }
           return MaterialPageRoute(builder: (context) => _errorScreen());

@@ -209,7 +209,6 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                     ],
                   )))),
       floatingActionButton: FloatingActionButton(
-        heroTag: 'add_medication_fab',
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             if (!selectedDays.contains(true)) {
@@ -226,6 +225,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
             Navigator.pop(context, medication);
           }
         },
+        heroTag: 'save_medication_fab',
         backgroundColor: Colors.greenAccent,
         child: const Icon(
           Icons.check,
