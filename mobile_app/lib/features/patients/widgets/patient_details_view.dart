@@ -269,7 +269,13 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
         children: [
           _buildActionButton(context, Icons.call, 'Call', Colors.green,
               onTap: () {
-            makePhoneCall(_currentPatient.phoneNumber);
+            try {
+              makePhoneCall(_currentPatient.phoneNumber);
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('Could not launch phone dialer: $e'),
+              ));
+            }
           }),
           _buildActionButton(context, Icons.message, 'Message', Colors.blue,
               onTap: () {
@@ -616,7 +622,7 @@ Future<void> makePhoneCall(String phoneNumber) async {
   if (await canLaunchUrl(launchUri)) {
     await launchUrl(launchUri);
   } else {
-    throw 'Could not launch $phoneNumber';
+    throw StateError('Could not launch $phoneNumber');
   }
 }
 
