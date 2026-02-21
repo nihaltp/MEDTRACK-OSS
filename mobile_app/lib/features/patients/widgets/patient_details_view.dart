@@ -5,6 +5,7 @@ import '../../../models/patient.dart';
 import '../../../models/appointment.dart';
 import '../../../models/patient_note.dart';
 import '../../../models/medication_log.dart';
+import '../../../models/goal.dart';
 
 class PatientDetailsView extends StatefulWidget {
   final Patient patient;
@@ -81,6 +82,8 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
               const SizedBox(height: 16),
               _buildActionButtons(context),
               const SizedBox(height: 24),
+              _buildRecoveryGoals(context),
+              const SizedBox(height: 16),
               _buildMedicationAdherence(context),
               const SizedBox(height: 16),
               _buildMedicalHistory(context),
@@ -628,6 +631,170 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildRecoveryGoals(BuildContext context) {
+    if (_currentPatient.goals.isEmpty) {
+       return const SizedBox.shrink(); // Hide if no goals
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Recovery Goals & Badges',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          ..._currentPatient.goals.map((goal) => _buildGoalCard(context, goal)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGoalCard(BuildContext context, Goal goal) {
+    final bool isGoalCompleted = goal.isCompleted;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: isGoalCompleted
+            ? BorderSide(color: Colors.amber.shade300, width: 2)
+            : BorderSide.none,
+      ),
+      elevation: isGoalCompleted ? 4 : 1,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: isGoalCompleted
+              ? LinearGradient(
+                  colors: [Colors.amber.shade50, Colors.white],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        goal.title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: isGoalCompleted ? Colors.amber.shade800 : Colors.black87,
+                            ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        goal.description,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isGoalCompleted)
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0, end: 1),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.elasticOut,
+                    builder: (context, value, child) {
+                       return Transform.scale(
+                         scale: value,
+                         child: Text(goal.badgeIcon, style: const TextStyle(fontSize: 40)),
+                       );
+                    }
+                  )
+                else
+                  Text(
+                     '${(goal.progress * 100).toInt()}%',
+                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueAccent),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: goal.progress,
+                minHeight: 10,
+                backgroundColor: Colors.grey[200],
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    isGoalCompleted ? Colors.amber : Colors.blueAccent),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...goal.milestones.map((milestone) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      milestone.isCompleted = !milestone.isCompleted;
+                    });
+                    
+                    if (goal.isCompleted) {
+                       ScaffoldMessenger.of(context).showSnackBar(
+                         SnackBar(
+                           backgroundColor: Colors.amber.shade800,
+                           content: Row(
+                             children: [
+                               Text(goal.badgeIcon, style: const TextStyle(fontSize: 24)),
+                               const SizedBox(width: 12),
+                               const Text('Goal Completed! Badge Unlocked!', style: TextStyle(fontWeight: FontWeight.bold)),
+                             ],
+                           )
+                         )
+                       );
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: milestone.isCompleted ? Colors.green.withOpacity(0.05) : Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                         color: milestone.isCompleted ? Colors.green.withOpacity(0.3) : Colors.grey.shade200
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          milestone.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+                          color: milestone.isCompleted ? Colors.green : Colors.grey.shade400,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            milestone.title,
+                            style: TextStyle(
+                              color: milestone.isCompleted ? Colors.black87 : Colors.black54,
+                              decoration: milestone.isCompleted ? TextDecoration.lineThrough : null,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
     );
   }
 

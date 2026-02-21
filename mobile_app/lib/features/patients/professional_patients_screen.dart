@@ -5,6 +5,7 @@ import 'widgets/patient_card.dart';
 import '../../models/appointment.dart';
 import '../../models/patient_note.dart';
 import '../../models/medication_log.dart';
+import '../../models/goal.dart';
 import 'package:uuid/uuid.dart';
 
 class ProfessionalPatientsScreen extends StatefulWidget {
@@ -68,6 +69,20 @@ class _ProfessionalPatientsScreenState
           status: 'Skipped',
         ),
       ],
+      goals: [
+        Goal(
+          title: 'Lower Blood Pressure',
+          description: 'Achieve a consistent BP reading below 130/80.',
+          targetDate: DateTime.now().add(const Duration(days: 30)),
+          badgeIcon: '🫀',
+          milestones: [
+            Milestone(title: 'Take Lisinopril consistently for 7 days', isCompleted: true),
+            Milestone(title: 'Reduce sodium intake', isCompleted: true),
+            Milestone(title: 'Log two readings below 135/85', isCompleted: false),
+            Milestone(title: 'Attend follow-up appointment', isCompleted: false),
+          ],
+        ),
+      ],
     ),
     Patient(
       id: 'P002',
@@ -99,6 +114,19 @@ class _ProfessionalPatientsScreenState
           medicationName: 'Metformin',
           scheduledTime: DateTime.now().subtract(const Duration(days: 4)),
           status: 'Skipped',
+        ),
+      ],
+      goals: [
+        Goal(
+          title: 'Improve Blood Sugar Levels',
+          description: 'Maintain healthy fasting blood sugar for two weeks.',
+          targetDate: DateTime.now().subtract(const Duration(days: 1)),
+          badgeIcon: '🏆',
+          milestones: [
+            Milestone(title: 'Complete 2 weeks of diet journal', isCompleted: true),
+            Milestone(title: 'Walk 30 minutes daily', isCompleted: true),
+            Milestone(title: 'Fasting glucose below 100 mg/dL', isCompleted: true),
+          ],
         ),
       ],
     ),
