@@ -85,7 +85,7 @@ class MedTrackApp extends StatelessWidget {
               : null;
 
           return MaterialPageRoute(
-            builder: (context) => AddReminderScreen(newReminder: reminder),
+            builder: (context) => AddReminderScreen(existingReminder: reminder),
           );
         }
 
