@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/routes.dart';
+import 'package:mobile_app/services/notification_service.dart';
 import '../../models/reminder.dart';
 
 // Mock reminder data
@@ -308,6 +309,10 @@ class _ReminderCardState extends State<_ReminderCard> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
+                      showTestNotification(
+                        widget.reminder.medication,
+                        widget.reminder.patient,
+                      );
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Test reminder sent!')),
                       );
