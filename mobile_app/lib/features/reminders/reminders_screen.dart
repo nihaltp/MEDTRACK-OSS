@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/routes.dart';
 import '../../models/reminder.dart';
+import 'add_reminder_screen.dart';
 
 class RemindersScreen extends StatefulWidget {
   const RemindersScreen({super.key});
@@ -110,7 +111,16 @@ class _RemindersScreenState extends State<RemindersScreen> {
               itemCount: reminders.length,
               itemBuilder: (context, index) {
                 final reminder = reminders[index];
-                return _ReminderCard(reminder: reminder);
+                // Inside RemindersScreen -> ListView.builder
+                return _ReminderCard(
+                  reminder: reminders[index],
+                  onUpdate: (updatedItem) {
+                    setState(() {
+                      reminders[index] =
+                          updatedItem; // This updates the list and the badge!
+                    });
+                  },
+                );
               },
             ),
       floatingActionButton: FloatingActionButton(
@@ -135,8 +145,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
 
 class _ReminderCard extends StatefulWidget {
   final Reminder reminder;
+  final Function(Reminder) onUpdate;
 
-  const _ReminderCard({required this.reminder});
+  const _ReminderCard({required this.reminder, required this.onUpdate});
 
   @override
   State<_ReminderCard> createState() => _ReminderCardState();
@@ -144,16 +155,18 @@ class _ReminderCard extends StatefulWidget {
 
 class _ReminderCardState extends State<_ReminderCard> {
   late bool _isEnabled;
+  late Reminder _currentReminder;
 
   @override
   void initState() {
     super.initState();
+    _currentReminder = widget.reminder;
     _isEnabled = widget.reminder.isEnabled;
   }
 
   @override
   Widget build(BuildContext context) {
-    final typeColor = _getTypeColor(widget.reminder.type);
+    final typeColor = _getTypeColor(_currentReminder.type);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -181,7 +194,7 @@ class _ReminderCardState extends State<_ReminderCard> {
                   ),
                   padding: const EdgeInsets.all(10),
                   child: Text(
-                    widget.reminder.icon,
+                    _currentReminder.icon,
                     style: const TextStyle(fontSize: 24),
                   ),
                 ),
@@ -192,7 +205,7 @@ class _ReminderCardState extends State<_ReminderCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.reminder.medication,
+                        _currentReminder.medication,
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -209,7 +222,7 @@ class _ReminderCardState extends State<_ReminderCard> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 2),
                             child: Text(
-                              widget.reminder.type,
+                              _currentReminder.type,
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
@@ -220,7 +233,7 @@ class _ReminderCardState extends State<_ReminderCard> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              '${widget.reminder.scheduledTime} • ${widget.reminder.patient}',
+                              '${_currentReminder.scheduledTime} • ${_currentReminder.patient}',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.black54,
@@ -238,7 +251,19 @@ class _ReminderCardState extends State<_ReminderCard> {
                   child: Switch(
                     value: _isEnabled,
                     onChanged: (value) {
-                      setState(() => _isEnabled = value);
+                      setState(() {
+                        _isEnabled = value;
+                        _currentReminder = Reminder(
+                            id: _currentReminder.id,
+                            medication: _currentReminder.medication,
+                            patient: _currentReminder.patient,
+                            scheduledTime: _currentReminder.scheduledTime,
+                            type: _currentReminder.type,
+                            notificationCount:
+                                _currentReminder.notificationCount);
+                      });
+                      widget.onUpdate(_currentReminder);
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -252,7 +277,7 @@ class _ReminderCardState extends State<_ReminderCard> {
                 ),
               ],
             ),
-            if (widget.reminder.notificationCount > 0) ...[
+            if (_currentReminder.notificationCount > 0) ...[
               const SizedBox(height: 12),
               Container(
                 decoration: BoxDecoration(
@@ -271,7 +296,7 @@ class _ReminderCardState extends State<_ReminderCard> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '${widget.reminder.notificationCount} notification${widget.reminder.notificationCount > 1 ? 's' : ''} before the reminder',
+                        '${_currentReminder.notificationCount} notification${_currentReminder.notificationCount > 1 ? 's' : ''} before the reminder',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.black54,
@@ -288,12 +313,22 @@ class _ReminderCardState extends State<_ReminderCard> {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content:
-                                Text('Edit reminder feature coming soon!')),
+                    onPressed: () async {
+                      final updatedReminder = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AddReminderScreen(
+                            existingReminder: widget.reminder,
+                          ),
+                        ),
                       );
+                      if (updatedReminder != null &&
+                          updatedReminder is Reminder) {
+                        setState(() {
+                          _currentReminder = updatedReminder;
+                        });
+                        widget.onUpdate(updatedReminder);
+                      }
                     },
                     icon: const Icon(Icons.edit_rounded, size: 16),
                     label: const Text('Edit'),

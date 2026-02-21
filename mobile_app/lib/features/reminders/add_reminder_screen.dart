@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../models/reminder.dart';
 
 class AddReminderScreen extends StatefulWidget {
-  const AddReminderScreen({super.key});
+  final Reminder? existingReminder;
+
+  const AddReminderScreen({super.key, this.existingReminder});
   static const String route = '/add_reminder';
 
   @override
@@ -11,6 +13,8 @@ class AddReminderScreen extends StatefulWidget {
 }
 
 class _AddReminderScreenState extends State<AddReminderScreen> {
+  bool get isEditing => widget.existingReminder != null;
+
   final _formKey = GlobalKey<FormState>();
   String _medicationName = '';
   String _patientName = '';
@@ -22,13 +26,27 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
   String? _selectedType;
 
   @override
+  void initState() {
+    super.initState();
+    if (isEditing) {
+      final reminder = widget.existingReminder!;
+      _medicationName = reminder.medication;
+      _patientName = reminder.patient;
+      _scheduledTime = TimeOfDay.now();
+      _selectedType = reminder.type;
+      _notificationCount = reminder.notificationCount;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-          appBar: AppBar(title: const Text("Add Reminder")),
+          appBar: AppBar(
+              title: isEditing ? Text("Edit Reminder") : Text("Add Reminder")),
           body: Padding(
               padding: EdgeInsets.all(20),
               child: Form(
@@ -37,6 +55,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                   child: Column(
                     children: [
                       TextFormField(
+                        initialValue: _patientName,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Please Enter Patient Name";
@@ -80,6 +99,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                         height: 15,
                       ),
                       TextFormField(
+                        initialValue: _medicationName,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Please Enter Medication Name";
@@ -276,8 +296,10 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                           if (_formKey.currentState!.validate() &&
                               _selectedType != null) {
                             _formKey.currentState!.save();
-                            final newReminder = Reminder(
-                              id: DateTime.now().millisecondsSinceEpoch,
+                            final updatedReminder = Reminder(
+                              id: isEditing
+                                  ? widget.existingReminder!.id
+                                  : DateTime.now().millisecondsSinceEpoch,
                               medication: _medicationName,
                               patient: _patientName,
                               scheduledTime: _scheduledTime.format(context),
@@ -286,10 +308,12 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                               notificationCount: _notificationCount,
                             );
 
-                            Navigator.pop(context, newReminder);
+                            Navigator.pop(context, updatedReminder);
                           }
                         },
-                        child: Text("Add Reminder"),
+                        child: isEditing
+                            ? Text("Save Changes")
+                            : Text("Add Reminder"),
                       ),
                     ],
                   ),
