@@ -114,44 +114,6 @@ class _RemindersScreenState extends State<RemindersScreen> {
           ),
         ],
       ),
-      body:
-          reminders.value.isEmpty
-              ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.notifications_off_rounded,
-                      size: 48,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No reminders set',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              )
-              : ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                itemCount: reminders.value.length,
-                itemBuilder: (context, index) {
-                  final reminder = reminders.value[index];
-                  return _ReminderCard(
-                    reminder: reminder,
-                    onDelete: () => _deleteReminder(reminder.id),
-                    onEdit: () => _editReminder(reminder),
-                  );
-                },
-              ),
       body: ValueListenableBuilder(
         valueListenable: reminders,
         builder: (context, value, child) {
