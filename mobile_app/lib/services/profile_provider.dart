@@ -7,7 +7,7 @@ class ProfileProvider with ChangeNotifier {
   final List<Dependent> _profiles = [
     Dependent(
       id: 'D001', 
-      name: 'Rajesh Kumar (Self)', 
+      name: 'Rajesh Kumar', 
       relation: 'Self',
       emergencyProfile: EmergencyProfile(bloodType: 'O+', allergies: ['Penicillin', 'Peanuts'], emergencyContactName: 'Priya Sharma', emergencyContactPhone: '+91 87654 32109'),
     ),

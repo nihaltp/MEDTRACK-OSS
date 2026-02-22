@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/routes.dart';
-
-import 'package:mobile_app/routes.dart';
 import '../../models/medication.dart';
 import 'package:provider/provider.dart';
 import '../../services/profile_provider.dart';

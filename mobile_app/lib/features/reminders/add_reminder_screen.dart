@@ -5,9 +5,6 @@ import '../../models/reminder.dart';
 class AddReminderScreen extends StatefulWidget {
   final Reminder? reminderToEdit;
   const AddReminderScreen({super.key, this.reminderToEdit});
-  final Reminder? existingReminder;
-
-  const AddReminderScreen({super.key, this.existingReminder});
   static const String route = '/add_reminder';
 
   @override
@@ -15,7 +12,7 @@ class AddReminderScreen extends StatefulWidget {
 }
 
 class _AddReminderScreenState extends State<AddReminderScreen> {
-  bool get isEditing => widget.existingReminder != null;
+  bool get isEditing => widget.reminderToEdit != null;
 
   final _formKey = GlobalKey<FormState>();
   String _medicationName = '';
@@ -29,7 +26,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.reminderToEdit != null) {
+    if (isEditing) {
       final reminder = widget.reminderToEdit!;
       _medicationName = reminder.medication;
       _patientName = reminder.patient;
@@ -54,13 +51,6 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
       return TimeOfDay(hour: hour, minute: minute);
     } catch (e) {
       return TimeOfDay.now();
-    if (isEditing) {
-      final reminder = widget.existingReminder!;
-      _medicationName = reminder.medication;
-      _patientName = reminder.patient;
-      _scheduledTime = TimeOfDay.now();
-      _selectedType = reminder.type;
-      _notificationCount = reminder.notificationCount;
     }
   }
 
@@ -73,10 +63,9 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
       child: Scaffold(
           appBar: AppBar(
             title: Text(
-              widget.reminderToEdit != null ? "Edit Reminder" : "Add Reminder",
+              isEditing ? "Edit Reminder" : "Add Reminder",
             ),
           ),
-              title: isEditing ? Text("Edit Reminder") : Text("Add Reminder")),
           body: Padding(
               padding: EdgeInsets.all(20),
               child: Form(
@@ -329,12 +318,8 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                             final reminderId = widget.reminderToEdit?.id ??
                                 DateTime.now().millisecondsSinceEpoch;
                             
-                            final newReminder = Reminder(
-                              id: reminderId,
                             final updatedReminder = Reminder(
-                              id: isEditing
-                                  ? widget.existingReminder!.id
-                                  : DateTime.now().millisecondsSinceEpoch,
+                              id: reminderId,
                               medication: _medicationName,
                               patient: _patientName,
                               scheduledTime: _scheduledTime.format(context),
@@ -346,12 +331,9 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                             Navigator.pop(context, updatedReminder);
                           }
                         },
-                        child: Text(widget.reminderToEdit != null
+                        child: Text(isEditing
                             ? "Update Reminder"
                             : "Add Reminder"),
-                        child: isEditing
-                            ? Text("Save Changes")
-                            : Text("Add Reminder"),
                       ),
                     ],
                   ),

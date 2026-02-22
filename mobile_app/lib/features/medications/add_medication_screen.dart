@@ -48,10 +48,13 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
     _refillsController.dispose();
     _pillsController.dispose();
     super.dispose();
-    "Saturday"
-  ];
+  }
 
   late Medication medication;
+
+  int _generateMedicationId() {
+    return DateTime.now().millisecondsSinceEpoch;
+  }
 
   @override
   void initState() {
@@ -96,10 +99,6 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
     _pillsController.text = medication.pillsRemaining.toString();
   }
 
-  int _generateMedicationId() {
-    return DateTime.now().millisecondsSinceEpoch;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,6 +113,8 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
             child: Column(
               children: [
                 TextFormField(
+                  initialValue:
+                      isEditMode ? widget.existingMedication!.name : '',
                   controller: _nameController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -132,6 +133,8 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  initialValue:
+                      isEditMode ? widget.existingMedication!.dosage : '',
                   controller: _dosageController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -150,6 +153,8 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  initialValue:
+                      isEditMode ? widget.existingMedication!.frequency : '',
                   controller: _frequencyController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -168,6 +173,8 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  initialValue:
+                      isEditMode ? widget.existingMedication!.purpose : '',
                   controller: _purposeController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -186,6 +193,8 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  initialValue:
+                      isEditMode ? widget.existingMedication!.icon : '',
                   controller: _iconController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
@@ -198,6 +207,9 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  initialValue: isEditMode
+                      ? widget.existingMedication!.rxNumber ?? ''
+                      : '',
                   controller: _rxNumberController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
@@ -274,28 +286,118 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                                 ),
                               ),
                             ],
-          child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        initialValue: widget.existingMedication?.name,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a medication name';
-                          }
-                          return null;
-                        },
-                        onSaved: (newValue) => medication.name = newValue!,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
                           ),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          hintText: 'Enter medication name',
+                        ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  initialValue: widget.existingMedication?.dosage,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a dosage';
+                    }
+                    return null;
+                  },
+                  onSaved: (newValue) => medication.dosage = newValue!,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    hintText: 'Enter dosage',
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  initialValue: widget.existingMedication?.frequency,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the frequency';
+                    }
+                    return null;
+                  },
+                  onSaved: (newValue) => medication.frequency = newValue!,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    hintText: 'Enter frequency',
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  initialValue: widget.existingMedication?.purpose,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the purpose';
+                    }
+                    return null;
+                  },
+                  onSaved: (newValue) => medication.purpose = newValue!,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    hintText: 'Enter purpose',
+                  ),
+                ),
+                SizedBox(height: 16),
+                TextFormField(
+                  initialValue: widget.existingMedication?.icon,
+                  onSaved: (newValue) => medication.icon = newValue ?? '',
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    hintText: 'Enter an Icon',
+                  ),
+                ),
+                SizedBox(height: 32),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      for (int i = 0; i < 7; i++)
+                        GestureDetector(
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Icon(
+                                Icons.circle,
+                                color: selectedDays[i]
+                                    ? Colors.greenAccent
+                                    : Colors.grey.shade200,
+                                size: 30,
+                                semanticLabel: days[i],
+                              ),
+                              Text(
+                                days[i][0],
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                ),
+                              )
+                            ],
+                          ),
+                          onTap: () {
+                            setState(() {
+                              selectedDays[i] = !selectedDays[i];
+                            });
+                          },
                         ),
                     ],
                   ),
@@ -305,118 +407,6 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
           ),
         ),
       ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        initialValue: widget.existingMedication?.dosage,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a dosage';
-                          }
-                          return null;
-                        },
-                        onSaved: (newValue) => medication.dosage = newValue!,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          hintText: 'Enter dosage',
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        initialValue: widget.existingMedication?.frequency,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter the frequency';
-                          }
-                          return null;
-                        },
-                        onSaved: (newValue) => medication.frequency = newValue!,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          hintText: 'Enter frequency',
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        initialValue: widget.existingMedication?.purpose,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter the purpose';
-                          }
-                          return null;
-                        },
-                        onSaved: (newValue) => medication.purpose = newValue!,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          hintText: 'Enter purpose',
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        initialValue: widget.existingMedication?.icon,
-                        onSaved: (newValue) => medication.icon = newValue ?? '',
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          hintText: 'Enter an Icon',
-                        ),
-                      ),
-                      SizedBox(height: 32),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              for (int i = 0; i < 7; i++)
-                                GestureDetector(
-                                  child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.circle,
-                                          color: selectedDays[i]
-                                              ? Colors.greenAccent
-                                              : Colors.grey.shade200,
-                                          size: 30,
-                                          semanticLabel: days[i],
-                                        ),
-                                        Text(
-                                          days[i][0],
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 12,
-                                          ),
-                                        )
-                                      ]),
-                                  onTap: () {
-                                    setState(() {
-                                      selectedDays[i] = !selectedDays[i];
-                                    });
-                                  },
-                                ),
-                            ]),
-                      ),
-                    ],
-                  )))),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (_formKey.currentState!.validate()) {
