@@ -308,14 +308,22 @@ class _ReminderCardState extends State<_ReminderCard> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () {
-                      NotificationService().showTestNotification(
-                        widget.reminder.medication,
-                        widget.reminder.patient,
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Test reminder sent!')),
-                      );
+                    onPressed: () async {
+                      try {
+                        NotificationService().showTestNotification(
+                          widget.reminder.medication,
+                          widget.reminder.patient,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Test reminder sent!')),
+                        );
+                      } on Exception catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content:
+                                  Text('Failed to send test reminder: $e')),
+                        );
+                      }
                     },
                     icon: const Icon(Icons.send_rounded, size: 16),
                     label: const Text('Test'),
