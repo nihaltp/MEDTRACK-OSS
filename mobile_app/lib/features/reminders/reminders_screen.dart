@@ -455,7 +455,7 @@ class _ReminderCardState extends State<_ReminderCard> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => AddReminderScreen(
-                            existingReminder: widget.reminder,
+                            reminderToEdit: widget.reminder,
                           ),
                         ),
                       );

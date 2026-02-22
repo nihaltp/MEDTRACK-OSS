@@ -12,7 +12,7 @@ class AddReminderScreen extends StatefulWidget {
 }
 
 class _AddReminderScreenState extends State<AddReminderScreen> {
-  bool get isEditing => widget.existingReminder != null;
+  bool get isEditing => widget.reminderToEdit != null;
 
   final _formKey = GlobalKey<FormState>();
   String _medicationName = '';
@@ -52,7 +52,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
     } catch (e) {
       return TimeOfDay.now();
     if (isEditing) {
-      final reminder = widget.existingReminder!;
+      final reminder = widget.reminderToEdit!;
       _medicationName = reminder.medication;
       _patientName = reminder.patient;
       _scheduledTime = TimeOfDay.now();
@@ -330,7 +330,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                               id: reminderId,
                             final updatedReminder = Reminder(
                               id: isEditing
-                                  ? widget.existingReminder!.id
+                                  ? widget.reminderToEdit!.id
                                   : DateTime.now().millisecondsSinceEpoch,
                               medication: _medicationName,
                               patient: _patientName,
