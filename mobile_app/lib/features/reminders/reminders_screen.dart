@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/routes.dart';
+import 'package:mobile_app/services/notification_service.dart';
 import '../../models/reminder.dart';
 import 'add_reminder_screen.dart';
 
@@ -66,63 +67,10 @@ class RemindersScreen extends StatefulWidget {
 }
 
 class _RemindersScreenState extends State<RemindersScreen> {
-  // Mock reminder data
-  final List<Reminder> reminders = [
-    Reminder(
-      id: 1,
-      medication: 'Lisinopril',
-      patient: 'John Doe',
-      scheduledTime: '08:00 AM',
-      type: 'Morning',
-      isEnabled: true,
-      notificationCount: 3,
-      icon: '📱',
-    ),
-    Reminder(
-      id: 2,
-      medication: 'Metformin',
-      patient: 'John Doe',
-      scheduledTime: '12:30 PM',
-      type: 'Afternoon',
-      isEnabled: true,
-      notificationCount: 2,
-      icon: '🔔',
-    ),
-    Reminder(
-      id: 3,
-      medication: 'Atorvastatin',
-      patient: 'Jane Smith',
-      scheduledTime: '09:00 PM',
-      type: 'Evening',
-      isEnabled: false,
-      notificationCount: 0,
-      icon: '🌙',
-    ),
-    Reminder(
-      id: 4,
-      medication: 'Aspirin',
-      patient: 'Michael Johnson',
-      scheduledTime: '08:00 AM',
-      type: 'Morning',
-      isEnabled: true,
-      notificationCount: 1,
-      icon: '⏰',
-    ),
-    Reminder(
-      id: 5,
-      medication: 'Blood Pressure Check',
-      patient: 'John Doe',
-      scheduledTime: '05:00 PM',
-      type: 'Weekly',
-      isEnabled: true,
-      notificationCount: 2,
-      icon: '💓',
-    ),
-  ];
-
   void _deleteReminder(int id) {
     setState(() {
-      reminders.removeWhere((r) => r.id == id);
+      reminders.value = List.from(reminders.value)
+        ..removeWhere((r) => r.id == id);
     });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Reminder deleted')),
@@ -139,9 +87,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
 
     if (result != null && result is Reminder) {
       setState(() {
-        final index = reminders.indexWhere((r) => r.id == reminder.id);
+        final index = reminders.value.indexWhere((r) => r.id == reminder.id);
         if (index != -1) {
-          reminders[index] = result;
+          reminders.value = [...reminders.value]..[index] = result;
         }
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -168,44 +116,6 @@ class _RemindersScreenState extends State<RemindersScreen> {
           ),
         ],
       ),
-      body:
-          reminders.isEmpty
-              ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.notifications_off_rounded,
-                      size: 48,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No reminders set',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              )
-              : ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                itemCount: reminders.length,
-                itemBuilder: (context, index) {
-                  final reminder = reminders[index];
-                  return _ReminderCard(
-                    reminder: reminder,
-                    onDelete: () => _deleteReminder(reminder.id),
-                    onEdit: () => _editReminder(reminder),
-                  );
-                },
-              ),
       body: ValueListenableBuilder(
         valueListenable: reminders,
         builder: (context, value, child) {
@@ -240,9 +150,12 @@ class _RemindersScreenState extends State<RemindersScreen> {
                     final reminder = reminders.value[index]; // Added .value
                     return _ReminderCard(
                       reminder: reminder,
+                      onDelete: () => _deleteReminder(reminder.id),
+                      onEdit: () => _editReminder(reminder),
                       onUpdate: (updatedItem) {
                         setState(() {
-                          reminders.value[index] = updatedItem;
+                          reminders.value = [...reminders.value]..[index] =
+                              updatedItem;
                         });
                       },
                     );
@@ -271,15 +184,14 @@ class _ReminderCard extends StatefulWidget {
   final Reminder reminder;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
+  final Function(Reminder) onUpdate;
 
   const _ReminderCard({
     required this.reminder,
     required this.onDelete,
     required this.onEdit,
+    required this.onUpdate,
   });
-  final Function(Reminder) onUpdate;
-
-  const _ReminderCard({required this.reminder, required this.onUpdate});
 
   @override
   State<_ReminderCard> createState() => _ReminderCardState();
@@ -430,8 +342,6 @@ class _ReminderCardState extends State<_ReminderCard> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '${widget.reminder.notificationCount} notification${widget.reminder.notificationCount > 1 ? 's' : ''} before the reminder',
-                        style: TextStyle(fontSize: 12, color: Colors.black54),
                         '${_currentReminder.notificationCount} notification${_currentReminder.notificationCount > 1 ? 's' : ''} before the reminder',
                         style: TextStyle(
                           fontSize: 12,
@@ -450,32 +360,15 @@ class _ReminderCardState extends State<_ReminderCard> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: widget.onEdit,
-                    onPressed: () async {
-                      final updatedReminder = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => AddReminderScreen(
-                            existingReminder: widget.reminder,
-                          ),
-                        ),
-                      );
-                      if (updatedReminder != null &&
-                          updatedReminder is Reminder) {
-                        setState(() {
-                          _currentReminder = updatedReminder;
-                        });
-                        widget.onUpdate(updatedReminder);
-                      }
-                    },
                     icon: const Icon(Icons.edit_rounded, size: 16),
                     label: const Text('Edit'),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: ElevatedButton.icon(
+                  child: OutlinedButton.icon(
                     onPressed: () {
-                      _showLogIntakeDialog(context, widget.reminder);
+                      _showLogIntakeDialog(context, _currentReminder);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: typeColor,
@@ -491,29 +384,28 @@ class _ReminderCardState extends State<_ReminderCard> {
                     onPressed: () {
                       showDialog(
                         context: context,
-                        builder:
-                            (context) => AlertDialog(
-                              title: const Text('Delete Reminder'),
-                              content: const Text(
-                                'Are you sure you want to delete this reminder?',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    widget.onDelete();
-                                  },
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.red,
-                                  ),
-                                  child: const Text('Delete'),
-                                ),
-                              ],
+                        builder: (context) => AlertDialog(
+                          title: const Text('Delete Reminder'),
+                          content: const Text(
+                            'Are you sure you want to delete this reminder?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Cancel'),
                             ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                widget.onDelete();
+                              },
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.red,
+                              ),
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        ),
                       );
                     },
                     style: OutlinedButton.styleFrom(
@@ -523,6 +415,42 @@ class _ReminderCardState extends State<_ReminderCard> {
                     ),
                     icon: const Icon(Icons.delete_rounded, size: 16),
                     label: const Text('Delete'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      try {
+                        if (!await NotificationService()
+                            .isPermissionAllowed()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Please enable notification permissions to test reminders.')),
+                          );
+                          return;
+                        }
+                        NotificationService().showTestNotification(
+                          widget.reminder.medication,
+                          widget.reminder.patient,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Test reminder sent!')),
+                        );
+                      } on Exception catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content:
+                                  Text('Failed to send test reminder: $e')),
+                        );
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                    ),
+                    icon: const Icon(Icons.send_rounded, size: 16),
+                    label: const Text('Test'),
                   ),
                 ),
               ],
@@ -549,7 +477,10 @@ class _ReminderCardState extends State<_ReminderCard> {
               children: [
                 Text(
                   'Log Medication Intake',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Text(

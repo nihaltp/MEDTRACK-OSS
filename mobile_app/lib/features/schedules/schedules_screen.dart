@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/models/reminder.dart';
 import 'package:mobile_app/models/schedule_entry.dart';
 import 'package:mobile_app/features/reminders/reminders_screen.dart';
@@ -312,12 +313,20 @@ class _ScheduleCard extends StatelessWidget {
                 : schedule.status == 'Upcoming'
                     ? OutlinedButton.icon(
                         onPressed: () {
+                          final String type = schedule.time.contains('AM')
+                              ? 'Morning'
+                              : DateFormat("hh:mm a")
+                                          .parse(schedule.time)
+                                          .hour <
+                                      6
+                                  ? 'Afternoon'
+                                  : 'Evening';
                           final newReminder = Reminder(
                               id: DateTime.now().millisecondsSinceEpoch,
                               medication: schedule.medication,
                               patient: schedule.patient,
                               scheduledTime: schedule.time,
-                              type: "",
+                              type: type,
                               isEnabled: true,
                               notificationCount: 0,
                               icon: schedule.icon);

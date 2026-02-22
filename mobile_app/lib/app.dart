@@ -5,6 +5,7 @@ import 'package:mobile_app/features/patients/widgets/add_patient_note_view.dart'
 import 'package:mobile_app/features/patients/widgets/patient_details_view.dart';
 import 'package:mobile_app/features/reminders/add_reminder_screen.dart';
 import 'package:mobile_app/features/schedules/schedule_appointment_view.dart';
+import 'package:mobile_app/models/appointment.dart';
 import 'package:mobile_app/models/medication.dart';
 import 'package:mobile_app/models/patient.dart';
 import 'package:mobile_app/models/patient_note.dart';
@@ -92,7 +93,7 @@ class MedTrackApp extends StatelessWidget {
               : null;
 
           return MaterialPageRoute(
-            builder: (context) => AddReminderScreen(existingReminder: reminder),
+            builder: (context) => AddReminderScreen(reminderToEdit: reminder),
           );
         }
 
