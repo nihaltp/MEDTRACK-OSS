@@ -3,6 +3,8 @@ import 'package:mobile_app/models/reminder.dart';
 import 'package:mobile_app/models/schedule_entry.dart';
 import 'package:mobile_app/features/reminders/reminders_screen.dart';
 import 'package:mobile_app/routes.dart';
+import 'package:mobile_app/services/csv_export_service.dart';
+import 'package:intl/intl.dart';
 
 class SchedulesScreen extends StatefulWidget {
   const SchedulesScreen({super.key});
@@ -13,20 +15,27 @@ class SchedulesScreen extends StatefulWidget {
 }
 
 class _SchedulesScreenState extends State<SchedulesScreen> {
-  // Mock schedule data
+  // Date filter range
+  DateTime _startDate = DateTime.now().subtract(const Duration(days: 7));
+  DateTime _endDate = DateTime.now();
+
+  // Mock schedule data updated with dates
   final List<ScheduleEntry> schedules = [
     ScheduleEntry(
       medication: 'Lisinopril',
       dosage: '10 mg',
+      date: DateTime.now(),
       time: '08:00 AM',
       patient: 'John Doe',
       status: 'Completed',
       statusColor: const Color(0xFF4CAF50),
       icon: '💊',
+      notes: 'Taken with water',
     ),
     ScheduleEntry(
       medication: 'Metformin',
       dosage: '500 mg',
+      date: DateTime.now(),
       time: '12:30 PM',
       patient: 'John Doe',
       status: 'Pending',
@@ -36,6 +45,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
     ScheduleEntry(
       medication: 'Lisinopril',
       dosage: '10 mg',
+      date: DateTime.now(),
       time: '08:00 PM',
       patient: 'John Doe',
       status: 'Upcoming',
@@ -45,6 +55,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
     ScheduleEntry(
       medication: 'Atorvastatin',
       dosage: '20 mg',
+      date: DateTime.now().subtract(const Duration(days: 1)),
       time: '09:00 PM',
       patient: 'Jane Smith',
       status: 'Completed',
@@ -54,6 +65,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
     ScheduleEntry(
       medication: 'Aspirin',
       dosage: '81 mg',
+      date: DateTime.now().add(const Duration(days: 1)),
       time: 'Tomorrow 08:00 AM',
       patient: 'Michael Johnson',
       status: 'Upcoming',
@@ -74,6 +86,13 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       appBar: AppBar(
         title: const Text('Medication Schedules'),
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () => _exportCsv(context),
+            icon: const Icon(Icons.download_rounded),
+            tooltip: 'Export CSV',
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -137,6 +156,29 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _exportCsv(BuildContext context) async {
+    // Filter by date range
+    final filtered = schedules.where((s) {
+      return s.date.isAfter(_startDate.subtract(const Duration(seconds: 1))) &&
+          s.date.isBefore(_endDate.add(const Duration(seconds: 1)));
+    }).toList();
+
+    if (filtered.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No data found for the selected range')),
+      );
+      return;
+    }
+
+    try {
+      await CsvExportService.exportAdherenceReport(filtered);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export failed: $e')),
+      );
+    }
   }
 }
 
