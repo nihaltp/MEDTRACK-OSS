@@ -66,6 +66,90 @@ class RemindersScreen extends StatefulWidget {
 }
 
 class _RemindersScreenState extends State<RemindersScreen> {
+  // Mock reminder data
+  final List<Reminder> reminders = [
+    Reminder(
+      id: 1,
+      medication: 'Lisinopril',
+      patient: 'John Doe',
+      scheduledTime: '08:00 AM',
+      type: 'Morning',
+      isEnabled: true,
+      notificationCount: 3,
+      icon: '📱',
+    ),
+    Reminder(
+      id: 2,
+      medication: 'Metformin',
+      patient: 'John Doe',
+      scheduledTime: '12:30 PM',
+      type: 'Afternoon',
+      isEnabled: true,
+      notificationCount: 2,
+      icon: '🔔',
+    ),
+    Reminder(
+      id: 3,
+      medication: 'Atorvastatin',
+      patient: 'Jane Smith',
+      scheduledTime: '09:00 PM',
+      type: 'Evening',
+      isEnabled: false,
+      notificationCount: 0,
+      icon: '🌙',
+    ),
+    Reminder(
+      id: 4,
+      medication: 'Aspirin',
+      patient: 'Michael Johnson',
+      scheduledTime: '08:00 AM',
+      type: 'Morning',
+      isEnabled: true,
+      notificationCount: 1,
+      icon: '⏰',
+    ),
+    Reminder(
+      id: 5,
+      medication: 'Blood Pressure Check',
+      patient: 'John Doe',
+      scheduledTime: '05:00 PM',
+      type: 'Weekly',
+      isEnabled: true,
+      notificationCount: 2,
+      icon: '💓',
+    ),
+  ];
+
+  void _deleteReminder(int id) {
+    setState(() {
+      reminders.removeWhere((r) => r.id == id);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Reminder deleted')),
+    );
+  }
+
+  Future<void> _editReminder(Reminder reminder) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddReminderScreen(reminderToEdit: reminder),
+      ),
+    );
+
+    if (result != null && result is Reminder) {
+      setState(() {
+        final index = reminders.indexWhere((r) => r.id == reminder.id);
+        if (index != -1) {
+          reminders[index] = result;
+        }
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Reminder updated successfully')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,6 +168,44 @@ class _RemindersScreenState extends State<RemindersScreen> {
           ),
         ],
       ),
+      body:
+          reminders.isEmpty
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.notifications_off_rounded,
+                      size: 48,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No reminders set',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+              : ListView.builder(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                itemCount: reminders.length,
+                itemBuilder: (context, index) {
+                  final reminder = reminders[index];
+                  return _ReminderCard(
+                    reminder: reminder,
+                    onDelete: () => _deleteReminder(reminder.id),
+                    onEdit: () => _editReminder(reminder),
+                  );
+                },
+              ),
       body: ValueListenableBuilder(
         valueListenable: reminders,
         builder: (context, value, child) {
@@ -130,10 +252,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final result = await Navigator.pushNamed(
-            context,
-            Routes.addReminder,
-          );
+          final result = await Navigator.pushNamed(context, Routes.addReminder);
           if (result != null && result is Reminder) {
             setState(() {
               reminders.value = [...reminders.value, result];
@@ -150,6 +269,14 @@ class _RemindersScreenState extends State<RemindersScreen> {
 
 class _ReminderCard extends StatefulWidget {
   final Reminder reminder;
+  final VoidCallback onDelete;
+  final VoidCallback onEdit;
+
+  const _ReminderCard({
+    required this.reminder,
+    required this.onDelete,
+    required this.onEdit,
+  });
   final Function(Reminder) onUpdate;
 
   const _ReminderCard({required this.reminder, required this.onUpdate});
@@ -175,9 +302,7 @@ class _ReminderCardState extends State<_ReminderCard> {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
@@ -225,7 +350,9 @@ class _ReminderCardState extends State<_ReminderCard> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 2),
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
                             child: Text(
                               _currentReminder.type,
                               style: TextStyle(
@@ -289,8 +416,10 @@ class _ReminderCardState extends State<_ReminderCard> {
                   color: Colors.grey[50],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 child: Row(
                   children: [
                     Icon(
@@ -301,6 +430,8 @@ class _ReminderCardState extends State<_ReminderCard> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
+                        '${widget.reminder.notificationCount} notification${widget.reminder.notificationCount > 1 ? 's' : ''} before the reminder',
+                        style: TextStyle(fontSize: 12, color: Colors.black54),
                         '${_currentReminder.notificationCount} notification${_currentReminder.notificationCount > 1 ? 's' : ''} before the reminder',
                         style: TextStyle(
                           fontSize: 12,
@@ -318,6 +449,7 @@ class _ReminderCardState extends State<_ReminderCard> {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
+                    onPressed: widget.onEdit,
                     onPressed: () async {
                       final updatedReminder = await Navigator.push(
                         context,
@@ -343,12 +475,54 @@ class _ReminderCardState extends State<_ReminderCard> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Test reminder sent!')),
+                      _showLogIntakeDialog(context, widget.reminder);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: typeColor,
+                      foregroundColor: Colors.white,
+                    ),
+                    icon: const Icon(Icons.check_circle_outline, size: 16),
+                    label: const Text('Log'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder:
+                            (context) => AlertDialog(
+                              title: const Text('Delete Reminder'),
+                              content: const Text(
+                                'Are you sure you want to delete this reminder?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    widget.onDelete();
+                                  },
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.red,
+                                  ),
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
                       );
                     },
-                    icon: const Icon(Icons.send_rounded, size: 16),
-                    label: const Text('Test'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                    ),
+                    icon: const Icon(Icons.delete_rounded, size: 16),
+                    label: const Text('Delete'),
                   ),
                 ),
               ],
@@ -356,6 +530,77 @@ class _ReminderCardState extends State<_ReminderCard> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showLogIntakeDialog(BuildContext context, Reminder reminder) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Log Medication Intake',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Did ${reminder.patient} take ${reminder.medication} today at ${reminder.scheduledTime}?',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Logged as Taken')),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        icon: const Icon(Icons.check_circle),
+                        label: const Text('Taken'),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Logged as Skipped')),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        icon: const Icon(Icons.cancel),
+                        label: const Text('Skipped'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

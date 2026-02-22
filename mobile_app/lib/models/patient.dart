@@ -1,5 +1,8 @@
 import 'appointment.dart';
 import 'patient_note.dart';
+import 'medication_log.dart';
+import 'goal.dart';
+import 'symptom_log.dart';
 
 class Patient {
   final String id;
@@ -12,6 +15,9 @@ class Patient {
   final String phoneNumber;
   final List<Appointment> appointments;
   final List<PatientNote> notes;
+  final List<MedicationLog> medicationLogs;
+  final List<Goal> goals;
+  final List<SymptomLog> symptomLogs;
 
   Patient({
     required this.id,
@@ -24,6 +30,9 @@ class Patient {
     this.phoneNumber = 'N/A',
     List<Appointment>? appointments,
     List<PatientNote>? notes,
+    this.medicationLogs = const [],
+    this.goals = const [],
+    this.symptomLogs = const [],
   })  : appointments = List<Appointment>.from(appointments ?? []),
         notes = List<PatientNote>.from(notes ?? []);
 
@@ -43,6 +52,15 @@ class Patient {
       notes: (json['notes'] as List<dynamic>?)
           ?.map((e) => PatientNote.fromJson(e as Map<String, dynamic>))
           .toList() ?? [],
+      medicationLogs: (json['medicationLogs'] as List<dynamic>?)
+          ?.map((e) => MedicationLog.fromJson(e as Map<String, dynamic>))
+          .toList() ?? [],
+      goals: (json['goals'] as List<dynamic>?)
+          ?.map((e) => Goal.fromJson(e as Map<String, dynamic>))
+          .toList() ?? [],
+      symptomLogs: (json['symptomLogs'] as List<dynamic>?)
+          ?.map((e) => SymptomLog.fromJson(e as Map<String, dynamic>))
+          .toList() ?? [],
     );
   }
 
@@ -58,6 +76,9 @@ class Patient {
       'phoneNumber': phoneNumber,
       'appointments': appointments.map((e) => e.toJson()).toList(),
       'notes': notes.map((e) => e.toJson()).toList(),
+      'medicationLogs': medicationLogs.map((e) => e.toJson()).toList(),
+      'goals': goals.map((e) => e.toJson()).toList(),
+      'symptomLogs': symptomLogs.map((e) => e.toJson()).toList(),
     };
   }
 }

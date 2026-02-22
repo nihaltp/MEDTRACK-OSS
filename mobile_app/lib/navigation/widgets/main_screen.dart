@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/features/home/home_screen.dart';
 import 'package:mobile_app/features/medications/medications_screen.dart';
-import 'package:mobile_app/features/patients/patients_screen.dart';
 import 'package:mobile_app/features/reminders/reminders_screen.dart';
 import 'package:mobile_app/features/schedules/schedules_screen.dart';
+import 'package:provider/provider.dart';
+import '../../services/profile_provider.dart';
+import '../../models/dependent.dart';
+import '../../routes.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -41,7 +44,58 @@ class MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profileProvider = context.watch<ProfileProvider>();
+    final activeProfile = profileProvider.activeProfile;
+
     return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            const CircleAvatar(
+              radius: 16,
+              child: Icon(Icons.person, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<Dependent>(
+                  value: activeProfile,
+                  isExpanded: true,
+                  icon: const Icon(Icons.arrow_drop_down, color: Colors.black87),
+                  onChanged: (Dependent? newValue) {
+                    if (newValue != null) {
+                      profileProvider.setActiveProfile(newValue.id);
+                    }
+                  },
+                  items: profileProvider.profiles.map<DropdownMenuItem<Dependent>>((Dependent profile) {
+                    return DropdownMenuItem<Dependent>(
+                      value: profile,
+                      child: Text(
+                        '${profile.name} (${profile.relation})',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_2_rounded, size: 28),
+            color: Colors.red[700],
+            tooltip: 'Emergency Passport',
+            onPressed: () {
+              Navigator.pushNamed(context, Routes.emergencyPassport);
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
+        backgroundColor: Colors.white,
+        elevation: 1,
+        shadowColor: Colors.black12,
+      ),
       body: IndexedStack(
         index: _selectedIndex,
         children: _screens,

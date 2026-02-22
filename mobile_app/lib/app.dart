@@ -29,6 +29,13 @@ class MedTrackApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) => ScheduleAppointmentView(patient: patient),
             );
+          } else if (settings.arguments is Map<String, dynamic>) {
+            final args = settings.arguments as Map<String, dynamic>;
+            final patient = args['patient'] as Patient;
+            final appointment = args['appointment'] as Appointment?;
+            return MaterialPageRoute(
+              builder: (context) => ScheduleAppointmentView(patient: patient, existingAppointment: appointment),
+            );
           }
           return MaterialPageRoute(builder: (context) => _errorScreen());
         }
