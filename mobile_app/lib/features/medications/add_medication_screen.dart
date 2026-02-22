@@ -48,8 +48,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
     _refillsController.dispose();
     _pillsController.dispose();
     super.dispose();
-    "Saturday"
-  ];
+  }
 
   late Medication medication;
 
