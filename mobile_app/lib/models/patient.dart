@@ -29,11 +29,11 @@ class Patient {
     required this.lastVisit,
     this.phoneNumber = 'N/A',
     this.appointments = const [],
-    this.notes = const [],
+    List<PatientNote>? notes,
     this.medicationLogs = const [],
     this.goals = const [],
     this.symptomLogs = const [],
-  });
+  }) : notes = List<PatientNote>.from(notes ?? []);
 
   factory Patient.fromJson(Map<String, dynamic> json) {
     return Patient(
