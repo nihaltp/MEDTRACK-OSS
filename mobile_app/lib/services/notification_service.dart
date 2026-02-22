@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
@@ -55,6 +57,21 @@ class NotificationService {
       badge: true,
       sound: true,
     );
+  }
+
+  Future<bool> isPermissionAllowed() async {
+    if (Platform.isAndroid) {
+      final androidImpl = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      return await androidImpl?.areNotificationsEnabled() ?? false;
+    } else if (Platform.isIOS) {
+      final iOSImpl = _plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      final settings = await iOSImpl?.checkPermissions();
+      // Check if the alert permission is granted
+      return settings?.isEnabled ?? false;
+    }
+    return false;
   }
 
   Future<void> showTestNotification(String medication, String patient) async {
