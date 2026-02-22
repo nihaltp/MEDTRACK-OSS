@@ -66,60 +66,6 @@ class RemindersScreen extends StatefulWidget {
 }
 
 class _RemindersScreenState extends State<RemindersScreen> {
-  // Mock reminder data
-  final List<Reminder> reminders = [
-    Reminder(
-      id: 1,
-      medication: 'Lisinopril',
-      patient: 'John Doe',
-      scheduledTime: '08:00 AM',
-      type: 'Morning',
-      isEnabled: true,
-      notificationCount: 3,
-      icon: '📱',
-    ),
-    Reminder(
-      id: 2,
-      medication: 'Metformin',
-      patient: 'John Doe',
-      scheduledTime: '12:30 PM',
-      type: 'Afternoon',
-      isEnabled: true,
-      notificationCount: 2,
-      icon: '🔔',
-    ),
-    Reminder(
-      id: 3,
-      medication: 'Atorvastatin',
-      patient: 'Jane Smith',
-      scheduledTime: '09:00 PM',
-      type: 'Evening',
-      isEnabled: false,
-      notificationCount: 0,
-      icon: '🌙',
-    ),
-    Reminder(
-      id: 4,
-      medication: 'Aspirin',
-      patient: 'Michael Johnson',
-      scheduledTime: '08:00 AM',
-      type: 'Morning',
-      isEnabled: true,
-      notificationCount: 1,
-      icon: '⏰',
-    ),
-    Reminder(
-      id: 5,
-      medication: 'Blood Pressure Check',
-      patient: 'John Doe',
-      scheduledTime: '05:00 PM',
-      type: 'Weekly',
-      isEnabled: true,
-      notificationCount: 2,
-      icon: '💓',
-    ),
-  ];
-
   void _deleteReminder(int id) {
     setState(() {
       reminders.removeWhere((r) => r.id == id);
