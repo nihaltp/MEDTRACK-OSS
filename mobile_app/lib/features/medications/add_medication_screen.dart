@@ -53,6 +53,10 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
 
   late Medication medication;
 
+  int _generateMedicationId() {
+    return DateTime.now().millisecondsSinceEpoch;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -94,10 +98,6 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
     _rxNumberController.text = medication.rxNumber ?? '';
     _refillsController.text = medication.refillsRemaining?.toString() ?? '';
     _pillsController.text = medication.pillsRemaining.toString();
-  }
-
-  int _generateMedicationId() {
-    return DateTime.now().millisecondsSinceEpoch;
   }
 
   @override
