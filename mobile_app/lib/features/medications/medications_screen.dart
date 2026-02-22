@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/routes.dart';
-
 import '../../models/medication.dart';
+import 'package:provider/provider.dart';
+import '../../services/profile_provider.dart';
 
 class MedicationsScreen extends StatefulWidget {
   const MedicationsScreen({super.key});
@@ -117,22 +118,90 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
           ),
           // Medications List
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              itemCount: filteredMeds.length,
-              itemBuilder: (context, index) {
-                final medication = filteredMeds[index];
-                return _MedicationCard(
+            child: Consumer<ProfileProvider>(
+              builder: (context, profileProvider, child) {
+                final activeProfileId = profileProvider.activeProfile?.id;
+                
+                // Mock filtering logic for medications
+                final profileMeds = filteredMeds.where((m) {
+                   bool matchesProfile = false;
+                   if (activeProfileId == 'D001' && (m.id == 1 || m.id == 2)) matchesProfile = true;
+                   if (activeProfileId == 'D002' && m.id == 3) matchesProfile = true;
+                   if (activeProfileId == 'D003' && m.id == 4) matchesProfile = true;
+                   
+                   if ([1, 2, 3, 4].contains(m.id) == false) {
+                      matchesProfile = true;
+                   }
+                   return matchesProfile;
+                }).toList();
+                
+                if (profileMeds.isEmpty) {
+                   return const Center(child: Text("No medications found for this dependent."));
+                }
+                
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  itemCount: profileMeds.length,
+                  itemBuilder: (context, index) {
+                    final medication = profileMeds[index];
+                    return _MedicationCard(
                   medication: medication,
                   onEdit: () => _editMedication(context, medication),
+                  onTakeDose: () {
+                    setState(() {
+                      if (medication.pillsRemaining > 0) {
+                        medication.pillsRemaining--;
+                        
+                        // Show a quick snackbar confirmation
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Dose taken. ${medication.pillsRemaining} pills remaining."),
+                            duration: const Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      } else {
+                         ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Cannot take dose: Out of pills!"),
+                            duration: Duration(seconds: 2),
+                            backgroundColor: Colors.red,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    });
+                  },
                 );
-              },
+                  },
+                );
+              }
             ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          final result = await Navigator.pushNamed(
+            context,
+            Routes.addMedication,
+          );
+
+          if (result != null && result is Medication) {
+            setState(() {
+              medications.add(result);
+              // Reset filter to 'All' or 'Active' to ensure the new med is visible if it matches
+              if (_filterValue == 'Inactive') {
+                _filterValue = 'All';
+              }
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${result.name} added successfully'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
           await _newMedication(context);
         },
         heroTag: 'add_medication_fab',
@@ -209,11 +278,15 @@ class _FilterChip extends StatelessWidget {
 class _MedicationCard extends StatelessWidget {
   final Medication medication;
   final VoidCallback onEdit;
+  final VoidCallback? onTakeDose; // Add onTakeDose callback
 
-  const _MedicationCard({required this.medication, required this.onEdit});
+  const _MedicationCard({required this.medication, required this.onEdit, this.onTakeDose});
 
   @override
   Widget build(BuildContext context) {
+    bool isLowInventory = medication.pillsRemaining <= 5;
+    bool needsDoctorAuth = isLowInventory && (medication.refillsRemaining == null || medication.refillsRemaining == 0);
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
@@ -223,13 +296,17 @@ class _MedicationCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: medication.isActive
-                ? medication.color.withOpacity(0.2)
-                : Colors.grey[200]!,
+            color: isLowInventory 
+                ? Colors.redAccent.withOpacity(0.5) 
+                : medication.isActive
+                  ? medication.color.withOpacity(0.2)
+                  : Colors.grey[200]!,
+            width: isLowInventory ? 2 : 1,
           ),
         ),
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
@@ -333,6 +410,54 @@ class _MedicationCard extends StatelessWidget {
                 ],
               ),
             ),
+            
+            // Refill Warning Section
+            if (isLowInventory) ...[
+              const SizedBox(height: 12),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Icon(
+                      needsDoctorAuth ? Icons.warning_amber_rounded : Icons.local_pharmacy_outlined,
+                      size: 20,
+                      color: Colors.red[700],
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            needsDoctorAuth 
+                              ? 'Contact Doctor: 0 Refills Left!' 
+                              : 'Low Supply: ${medication.pillsRemaining} pills left',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red[700],
+                            ),
+                          ),
+                          if (!needsDoctorAuth)
+                            Text(
+                              'Rx: ${medication.rxNumber ?? 'Unknown'} • Refills: ${medication.refillsRemaining}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.red[700],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
             const SizedBox(height: 12),
             Row(
               children: [
@@ -356,6 +481,21 @@ class _MedicationCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (onTakeDose != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ElevatedButton.icon(
+                      onPressed: onTakeDose,
+                      icon: const Icon(Icons.check_circle_outline, size: 16),
+                      label: const Text('Take'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
                 OutlinedButton.icon(
                   onPressed: onEdit,
                   icon: const Icon(Icons.edit_rounded, size: 16),

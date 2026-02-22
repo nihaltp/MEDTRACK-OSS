@@ -6,8 +6,13 @@ import 'package:uuid/uuid.dart';
 class ScheduleAppointmentView extends StatefulWidget {
   static const String route = '/schedule_appointment';
   final Patient patient;
+  final Appointment? existingAppointment;
 
-  const ScheduleAppointmentView({super.key, required this.patient});
+  const ScheduleAppointmentView({
+    super.key,
+    required this.patient,
+    this.existingAppointment,
+  });
 
   @override
   State<ScheduleAppointmentView> createState() =>
@@ -30,6 +35,17 @@ class _ScheduleAppointmentViewState extends State<ScheduleAppointmentView> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.existingAppointment != null) {
+      _selectedDate = widget.existingAppointment!.date;
+      _selectedTime = widget.existingAppointment!.time;
+      _selectedType = widget.existingAppointment!.type;
+      _noteController.text = widget.existingAppointment!.notes ?? '';
+    }
+  }
+
+  @override
   void dispose() {
     _noteController.dispose();
     super.dispose();
@@ -39,7 +55,7 @@ class _ScheduleAppointmentViewState extends State<ScheduleAppointmentView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Schedule Appointment'),
+        title: Text(widget.existingAppointment != null ? 'Reschedule Appointment' : 'Schedule Appointment'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -68,9 +84,9 @@ class _ScheduleAppointmentViewState extends State<ScheduleAppointmentView> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Confirm Appointment',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                child: Text(
+                  widget.existingAppointment != null ? 'Update Appointment' : 'Confirm Appointment',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -217,19 +233,30 @@ class _ScheduleAppointmentViewState extends State<ScheduleAppointmentView> {
         return;
       }
 
-      final newAppointment = Appointment(
-        id: const Uuid().v4(),
-        patientId: widget.patient.id,
-        date: _selectedDate!,
-        time: _selectedTime!,
-        type: _selectedType,
-        notes: _noteController.text.isEmpty ? null : _noteController.text,
-      );
+      final Appointment finalAppointment;
+      
+      if (widget.existingAppointment != null) {
+        finalAppointment = widget.existingAppointment!.copyWith(
+          date: _selectedDate,
+          time: _selectedTime,
+          type: _selectedType,
+          notes: _noteController.text.isEmpty ? null : _noteController.text,
+        );
+      } else {
+        finalAppointment = Appointment(
+          id: const Uuid().v4(),
+          patientId: widget.patient.id,
+          date: _selectedDate!,
+          time: _selectedTime!,
+          type: _selectedType,
+          notes: _noteController.text.isEmpty ? null : _noteController.text,
+        );
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Appointment Scheduled Successfully')),
+        SnackBar(content: Text(widget.existingAppointment != null ? 'Appointment Rescheduled Successfully' : 'Appointment Scheduled Successfully')),
       );
-      Navigator.pop(context, newAppointment);
+      Navigator.pop(context, finalAppointment);
     }
   }
 }

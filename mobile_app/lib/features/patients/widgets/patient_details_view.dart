@@ -4,6 +4,10 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../models/patient.dart';
 import '../../../models/appointment.dart';
 import '../../../models/patient_note.dart';
+import '../../../models/medication_log.dart';
+import '../../../models/goal.dart';
+import '../../../models/symptom_log.dart';
+import 'add_symptom_view.dart';
 
 class PatientDetailsView extends StatefulWidget {
   final Patient patient;
@@ -80,6 +84,12 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
               const SizedBox(height: 16),
               _buildActionButtons(context),
               const SizedBox(height: 24),
+              _buildRecoveryGoals(context),
+              const SizedBox(height: 16),
+              _buildMedicationAdherence(context),
+              const SizedBox(height: 16),
+              _buildSymptomLogs(context),
+              const SizedBox(height: 16),
               _buildMedicalHistory(context),
             ],
           ),
@@ -300,25 +310,49 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
               );
             }
           }),
-          _buildActionButton(context, Icons.note_add, 'Add Note', Colors.orange,
-              onTap: () async {
-            final result = await Navigator.pushNamed(
-              context,
-              Routes.addPatientNote,
-              arguments: _currentPatient,
-            );
-
-            if (result != null && result is PatientNote) {
-              setState(() {
-                _currentPatient.notes.add(result);
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Note added successfully')),
+            _buildActionButton(context, Icons.sick, 'Symptom', Colors.redAccent,
+                onTap: () async {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (BuildContext context) {
+                  return AddSymptomView(
+                    patientId: _currentPatient.id,
+                    onSave: (symptomData) {
+                      final newLog = SymptomLog.fromJson(symptomData);
+                      setState(() {
+                        _currentPatient.symptomLogs.add(newLog);
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Symptom logged successfully')),
+                      );
+                    },
+                  );
+                },
               );
-            }
-          }),
-        ],
-      ),
+            }),
+            _buildActionButton(context, Icons.note_add, 'Add Note', Colors.orange,
+                onTap: () async {
+              final result = await Navigator.pushNamed(
+                context,
+                Routes.addPatientNote,
+                arguments: _currentPatient,
+              );
+
+              if (result != null && result is PatientNote) {
+                setState(() {
+                  _currentPatient.notes.add(result);
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Note added successfully')),
+                );
+              }
+            }),
+          ],
+        ),
     );
   }
 
@@ -359,12 +393,24 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
           const SizedBox(height: 16),
           if (_currentPatient.appointments.isNotEmpty)
             ..._currentPatient.appointments.map((appointment) {
+              Color statusColor = Colors.purple;
+              IconData statusIcon = Icons.calendar_today;
+              
+              if (appointment.status == 'Completed') {
+                statusColor = Colors.green;
+                statusIcon = Icons.check_circle;
+              } else if (appointment.status == 'Cancelled') {
+                statusColor = Colors.red;
+                statusIcon = Icons.cancel;
+              }
+
               return _buildHistoryItem(
                 context,
-                appointment.type,
+                '${appointment.type} (${appointment.status})',
                 '${appointment.date.day}/${appointment.date.month}/${appointment.date.year} • ${appointment.time.hour}:${appointment.time.minute.toString().padLeft(2, '0')}',
-                Icons.calendar_today,
-                color: Colors.purple,
+                statusIcon,
+                color: statusColor,
+                onTap: () => _showAppointmentActions(context, appointment),
               );
             }),
           if (_currentPatient.appointments.isEmpty)
@@ -403,6 +449,220 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
           ),
           const SizedBox(height: 24),
           _buildNotesList(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMedicationAdherence(BuildContext context) {
+    if (_currentPatient.medicationLogs.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Medication Adherence',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                children: [
+                   Icon(Icons.assessment_outlined, size: 48, color: Colors.grey[400]),
+                   const SizedBox(height: 12),
+                   Text(
+                     'No intake data available',
+                     style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500),
+                   ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final totalLogs = _currentPatient.medicationLogs.length;
+    final takenLogs = _currentPatient.medicationLogs.where((l) => l.status == 'Taken').length;
+    final adherenceRate = takenLogs / totalLogs;
+
+    Color adherenceColor = Colors.green;
+    if (adherenceRate < 0.5) {
+      adherenceColor = Colors.red;
+    } else if (adherenceRate < 0.8) {
+      adherenceColor = Colors.orange;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Medication Adherence',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '${(adherenceRate * 100).toInt()}%',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: adherenceColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: adherenceRate,
+              minHeight: 12,
+              backgroundColor: Colors.grey[200],
+              valueColor: AlwaysStoppedAnimation<Color>(adherenceColor),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '$takenLogs of $totalLogs doses taken recently',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+          ),
+          const SizedBox(height: 16),
+          ..._currentPatient.medicationLogs.take(3).map((log) {
+            final isTaken = log.status == 'Taken';
+            return Card(
+              margin: const EdgeInsets.only(bottom: 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: isTaken ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+                  child: Icon(
+                    isTaken ? Icons.check : Icons.close,
+                    color: isTaken ? Colors.green : Colors.orange,
+                  ),
+                ),
+                title: Text(log.medicationName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: Text('${log.scheduledTime.day}/${log.scheduledTime.month} • ${log.scheduledTime.hour}:${log.scheduledTime.minute.toString().padLeft(2, '0')}'),
+                trailing: Text(
+                  log.status,
+                  style: TextStyle(
+                    color: isTaken ? Colors.green : Colors.orange,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSymptomLogs(BuildContext context) {
+    if (_currentPatient.symptomLogs.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Symptom Tracker',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                children: [
+                   Icon(Icons.monitor_heart_outlined, size: 48, color: Colors.grey[400]),
+                   const SizedBox(height: 12),
+                   Text(
+                     'No symptoms logged',
+                     style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500),
+                   ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Recent Symptoms',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '${_currentPatient.symptomLogs.length} logs',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: Colors.redAccent,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ..._currentPatient.symptomLogs.reversed.take(5).map((log) {
+            Color severityColor = Colors.green;
+            if (log.severity >= 8) {
+              severityColor = Colors.red;
+            } else if (log.severity >= 4) {
+              severityColor = Colors.orange;
+            }
+
+            final parsedDate = DateTime.parse(log.date);
+
+            return Card(
+              margin: const EdgeInsets.only(bottom: 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: severityColor.withOpacity(0.1),
+                  child: Text(
+                    log.severity.toString(),
+                    style: TextStyle(color: severityColor, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                title: Text(log.symptomName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${parsedDate.day}/${parsedDate.month} • ${parsedDate.hour}:${parsedDate.minute.toString().padLeft(2, '0')}'),
+                    if (log.notes.isNotEmpty)
+                       Padding(
+                         padding: const EdgeInsets.only(top: 4),
+                         child: Text(log.notes, style: const TextStyle(fontStyle: FontStyle.italic)),
+                       ),
+                  ],
+                ),
+                isThreeLine: log.notes.isNotEmpty,
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -502,6 +762,261 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
     );
   }
 
+  Widget _buildRecoveryGoals(BuildContext context) {
+    if (_currentPatient.goals.isEmpty) {
+       return const SizedBox.shrink(); // Hide if no goals
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Recovery Goals & Badges',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          ..._currentPatient.goals.map((goal) => _buildGoalCard(context, goal)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGoalCard(BuildContext context, Goal goal) {
+    final bool isGoalCompleted = goal.isCompleted;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: isGoalCompleted
+            ? BorderSide(color: Colors.amber.shade300, width: 2)
+            : BorderSide.none,
+      ),
+      elevation: isGoalCompleted ? 4 : 1,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: isGoalCompleted
+              ? LinearGradient(
+                  colors: [Colors.amber.shade50, Colors.white],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        goal.title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: isGoalCompleted ? Colors.amber.shade800 : Colors.black87,
+                            ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        goal.description,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isGoalCompleted)
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0, end: 1),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.elasticOut,
+                    builder: (context, value, child) {
+                       return Transform.scale(
+                         scale: value,
+                         child: Text(goal.badgeIcon, style: const TextStyle(fontSize: 40)),
+                       );
+                    }
+                  )
+                else
+                  Text(
+                     '${(goal.progress * 100).toInt()}%',
+                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueAccent),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: goal.progress,
+                minHeight: 10,
+                backgroundColor: Colors.grey[200],
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    isGoalCompleted ? Colors.amber : Colors.blueAccent),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...goal.milestones.map((milestone) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      milestone.isCompleted = !milestone.isCompleted;
+                    });
+                    
+                    if (goal.isCompleted) {
+                       ScaffoldMessenger.of(context).showSnackBar(
+                         SnackBar(
+                           backgroundColor: Colors.amber.shade800,
+                           content: Row(
+                             children: [
+                               Text(goal.badgeIcon, style: const TextStyle(fontSize: 24)),
+                               const SizedBox(width: 12),
+                               const Text('Goal Completed! Badge Unlocked!', style: TextStyle(fontWeight: FontWeight.bold)),
+                             ],
+                           )
+                         )
+                       );
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: milestone.isCompleted ? Colors.green.withOpacity(0.05) : Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                         color: milestone.isCompleted ? Colors.green.withOpacity(0.3) : Colors.grey.shade200
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          milestone.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+                          color: milestone.isCompleted ? Colors.green : Colors.grey.shade400,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            milestone.title,
+                            style: TextStyle(
+                              color: milestone.isCompleted ? Colors.black87 : Colors.black54,
+                              decoration: milestone.isCompleted ? TextDecoration.lineThrough : null,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAppointmentActions(BuildContext context, Appointment appointment) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Text(
+                  'Manage Appointment',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
+              const Divider(),
+              if (appointment.status == 'Scheduled')
+                ListTile(
+                  leading: const Icon(Icons.check_circle, color: Colors.green),
+                  title: const Text('Mark as Completed'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _updateAppointmentStatus(appointment, 'Completed');
+                  },
+                ),
+              if (appointment.status == 'Scheduled')
+                ListTile(
+                  leading: const Icon(Icons.edit_calendar, color: Colors.orange),
+                  title: const Text('Reschedule'),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final result = await Navigator.pushNamed(
+                      context,
+                      Routes.scheduleAppointment,
+                      arguments: {
+                        'patient': _currentPatient,
+                        'appointment': appointment,
+                      },
+                    );
+                    
+                    if (result != null && result is Appointment) {
+                      _updateAppointmentData(result);
+                    }
+                  },
+                ),
+              if (appointment.status == 'Scheduled')
+                ListTile(
+                  leading: const Icon(Icons.cancel, color: Colors.red),
+                  title: const Text('Cancel Appointment'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _updateAppointmentStatus(appointment, 'Cancelled');
+                  },
+                ),
+                
+              if (appointment.status != 'Scheduled')
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'This appointment is already ${appointment.status.toLowerCase()}.',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _updateAppointmentStatus(Appointment appointment, String newStatus) {
+    final updatedAppointment = appointment.copyWith(status: newStatus);
+    _updateAppointmentData(updatedAppointment);
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Appointment marked as $newStatus')),
+    );
+  }
+
+  void _updateAppointmentData(Appointment updatedAppointment) {
+    setState(() {
+      final index = _currentPatient.appointments.indexWhere((a) => a.id == updatedAppointment.id);
+      if (index != -1) {
+        _currentPatient.appointments[index] = updatedAppointment;
+      }
+    });
+  }
+
   Future<void> _editNote(PatientNote note) async {
     final result =
         await Navigator.pushNamed(context, Routes.addPatientNote, arguments: {
@@ -560,6 +1075,7 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
     String subtitle,
     IconData icon, {
     Color color = Colors.blue,
+    VoidCallback? onTap,
   }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -581,7 +1097,7 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
         ),
         subtitle: Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {},
+        onTap: onTap,
       ),
     );
   }

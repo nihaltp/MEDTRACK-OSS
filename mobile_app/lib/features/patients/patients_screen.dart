@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/routes.dart';
 import '../../models/patient.dart';
 import 'widgets/patient_card.dart';
+import 'package:provider/provider.dart';
+import '../../services/profile_provider.dart';
 
 class PatientsScreen extends StatefulWidget {
   const PatientsScreen({super.key});
@@ -78,8 +80,25 @@ class _PatientsScreenState extends State<PatientsScreen> {
   }
 
   String? _selectedStatus;
-  List<Patient> get _filteredPatients {
+  List<Patient> getFilteredPatients(BuildContext context) {
+    final activeProfileId = context.watch<ProfileProvider>().activeProfile?.id;
+    
     return _patients.where((p) {
+      // Temporary logic: since we have static mocked data, we'll arbitrarily 
+      // map patients to dependents based on their ID to simulate filtering.
+      // E.g., D001 sees P001 & P002, D002 sees P003, D003 sees P004 & P005.
+      bool matchesProfile = false;
+      if (activeProfileId == 'D001' && (p.id == 'P001' || p.id == 'P002')) matchesProfile = true;
+      if (activeProfileId == 'D002' && p.id == 'P003') matchesProfile = true;
+      if (activeProfileId == 'D003' && (p.id == 'P004' || p.id == 'P005')) matchesProfile = true;
+      
+      // If a new patient is added, show it on the current profile for demo purposes
+      if (['P001', 'P002', 'P003', 'P004', 'P005'].contains(p.id) == false) {
+        matchesProfile = true;
+      }
+      
+      if (!matchesProfile) return false;
+
       final matchesSearch = _searchQuery.isEmpty ||
           p.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           p.condition.toLowerCase().contains(_searchQuery.toLowerCase());
@@ -156,16 +175,26 @@ class _PatientsScreenState extends State<PatientsScreen> {
           _buildSearchBar(),
           if (_hasActiveFilters) _buildActiveFilters(),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.only(top: 8, bottom: 24),
-              itemCount: _filteredPatients.length,
-              itemBuilder: (context, index) {
-                final patient = _filteredPatients[index];
-                return PatientCard(
-                  patient: patient,
-                  onTap: () => _navigateToPatientDetails(patient),
+            child: Consumer<ProfileProvider>(
+              builder: (context, profileProvider, child) {
+                final filtered = getFilteredPatients(context);
+                
+                if (filtered.isEmpty) {
+                   return const Center(child: Text("No patients found for this dependent."));
+                }
+                
+                return ListView.builder(
+                  padding: const EdgeInsets.only(top: 8, bottom: 24),
+                  itemCount: filtered.length,
+                  itemBuilder: (context, index) {
+                    final patient = filtered[index];
+                    return PatientCard(
+                      patient: patient,
+                      onTap: () => _navigateToPatientDetails(patient),
+                    );
+                  },
                 );
-              },
+              }
             ),
           ),
         ],
