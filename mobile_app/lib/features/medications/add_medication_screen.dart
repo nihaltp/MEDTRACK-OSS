@@ -113,6 +113,8 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
             child: Column(
               children: [
                 TextFormField(
+                  initialValue:
+                      isEditMode ? widget.existingMedication!.name : '',
                   controller: _nameController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -131,6 +133,8 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  initialValue:
+                      isEditMode ? widget.existingMedication!.dosage : '',
                   controller: _dosageController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -149,6 +153,8 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  initialValue:
+                      isEditMode ? widget.existingMedication!.frequency : '',
                   controller: _frequencyController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -167,6 +173,8 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  initialValue:
+                      isEditMode ? widget.existingMedication!.purpose : '',
                   controller: _purposeController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -185,6 +193,8 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  initialValue:
+                      isEditMode ? widget.existingMedication!.icon : '',
                   controller: _iconController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
@@ -197,6 +207,9 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 SizedBox(height: 16),
                 TextFormField(
+                  initialValue: isEditMode
+                      ? widget.existingMedication!.rxNumber ?? ''
+                      : '',
                   controller: _rxNumberController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
