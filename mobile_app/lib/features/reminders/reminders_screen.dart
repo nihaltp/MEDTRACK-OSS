@@ -179,15 +179,14 @@ class _ReminderCard extends StatefulWidget {
   final Reminder reminder;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
+  final Function(Reminder) onUpdate;
 
   const _ReminderCard({
     required this.reminder,
     required this.onDelete,
     required this.onEdit,
+    required this.onUpdate,
   });
-  final Function(Reminder) onUpdate;
-
-  const _ReminderCard({required this.reminder, required this.onUpdate});
 
   @override
   State<_ReminderCard> createState() => _ReminderCardState();
