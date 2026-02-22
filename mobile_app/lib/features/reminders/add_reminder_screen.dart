@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../models/reminder.dart';
 
@@ -39,16 +40,15 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
 
   TimeOfDay _parseTime(String timeString) {
     try {
-      final parts = timeString.split(' ');
-      final timeParts = parts[0].split(':');
-      int hour = int.parse(timeParts[0]);
-      int minute = int.parse(timeParts[1]);
-      if (parts[1] == 'PM' && hour != 12) {
-        hour += 12;
-      } else if (parts[1] == 'AM' && hour == 12) {
-        hour = 0;
+      final timeMatch =
+          RegExp(r'\d{1,2}:\d{2}\s?[APap][Mm]').firstMatch(timeString);
+      if (timeMatch == null) {
+        throw FormatException("No time found");
       }
-      return TimeOfDay(hour: hour, minute: minute);
+
+      final timePart = timeMatch.group(0)!;
+      final dateTime = DateFormat("hh:mm a").parse(timePart);
+      return TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
     } catch (e) {
       return TimeOfDay.now();
     }
