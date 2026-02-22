@@ -338,12 +338,9 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                             Navigator.pop(context, updatedReminder);
                           }
                         },
-                        child: Text(widget.reminderToEdit != null
+                        child: Text(isEditing
                             ? "Update Reminder"
                             : "Add Reminder"),
-                        child: isEditing
-                            ? Text("Save Changes")
-                            : Text("Add Reminder"),
                       ),
                     ],
                   ),
