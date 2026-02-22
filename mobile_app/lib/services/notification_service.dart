@@ -59,7 +59,8 @@ class NotificationService {
         NotificationDetails(android: androidNotificationDetails);
 
     await _plugin.show(
-      id: 0,
+      id: DateTime.now().millisecondsSinceEpoch &
+          0x7fffffff, // Unique ID for each notification so there will be no conflicts
       title: 'Medication Test: $medication',
       body: 'Reminder for $patient',
       notificationDetails: notificationDetails,
