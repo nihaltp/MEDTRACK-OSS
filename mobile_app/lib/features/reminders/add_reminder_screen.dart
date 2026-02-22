@@ -70,10 +70,9 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
       child: Scaffold(
           appBar: AppBar(
             title: Text(
-              widget.reminderToEdit != null ? "Edit Reminder" : "Add Reminder",
+              isEditing ? "Edit Reminder" : "Add Reminder",
             ),
           ),
-              title: isEditing ? Text("Edit Reminder") : Text("Add Reminder")),
           body: Padding(
               padding: EdgeInsets.all(20),
               child: Form(
