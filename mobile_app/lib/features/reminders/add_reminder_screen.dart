@@ -325,12 +325,8 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                             final reminderId = widget.reminderToEdit?.id ??
                                 DateTime.now().millisecondsSinceEpoch;
                             
-                            final newReminder = Reminder(
-                              id: reminderId,
                             final updatedReminder = Reminder(
-                              id: isEditing
-                                  ? widget.reminderToEdit!.id
-                                  : DateTime.now().millisecondsSinceEpoch,
+                              id: reminderId,
                               medication: _medicationName,
                               patient: _patientName,
                               scheduledTime: _scheduledTime.format(context),
