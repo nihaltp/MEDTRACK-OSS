@@ -366,38 +366,14 @@ class _ReminderCardState extends State<_ReminderCard> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Delete Reminder'),
-                          content: const Text(
-                            'Are you sure you want to delete this reminder?',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                widget.onDelete();
-                              },
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.red,
-                              ),
-                              child: const Text('Delete'),
-                            ),
-                          ],
-                        ),
-                      );
+                      _showLogIntakeDialog(context, _currentReminder);
                     },
-                    icon: const Icon(Icons.delete_rounded, size: 16),
-                    label: const Text('Delete'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.red,
-                      side: const BorderSide(color: Colors.red),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: typeColor,
+                      foregroundColor: Colors.white,
                     ),
+                    icon: const Icon(Icons.check_circle_outline, size: 16),
+                    label: const Text('Log'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -430,12 +406,13 @@ class _ReminderCardState extends State<_ReminderCard> {
                         ),
                       );
                     },
-                    icon: const Icon(Icons.delete_rounded, size: 16),
-                    label: const Text('Delete'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
                       side: const BorderSide(color: Colors.red),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
                     ),
+                    icon: const Icon(Icons.delete_rounded, size: 16),
+                    label: const Text('Delete'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -468,12 +445,10 @@ class _ReminderCardState extends State<_ReminderCard> {
                       }
                     },
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.red,
-                      side: const BorderSide(color: Colors.red),
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                     ),
-                    icon: const Icon(Icons.delete_rounded, size: 16),
-                    label: const Text('Delete'),
+                    icon: const Icon(Icons.send_rounded, size: 16),
+                    label: const Text('Test'),
                   ),
                 ),
               ],
