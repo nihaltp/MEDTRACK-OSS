@@ -359,23 +359,6 @@ class _ReminderCardState extends State<_ReminderCard> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: widget.onEdit,
-                    onPressed: () async {
-                      final updatedReminder = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => AddReminderScreen(
-                            reminderToEdit: widget.reminder,
-                          ),
-                        ),
-                      );
-                      if (updatedReminder != null &&
-                          updatedReminder is Reminder) {
-                        setState(() {
-                          _currentReminder = updatedReminder;
-                        });
-                        widget.onUpdate(updatedReminder);
-                      }
-                    },
                     icon: const Icon(Icons.edit_rounded, size: 16),
                     label: const Text('Edit'),
                   ),
