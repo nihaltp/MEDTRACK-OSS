@@ -310,6 +310,15 @@ class _ReminderCardState extends State<_ReminderCard> {
                   child: ElevatedButton.icon(
                     onPressed: () async {
                       try {
+                        if (!await NotificationService()
+                            .isPermissionAllowed()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Please enable notification permissions to test reminders.')),
+                          );
+                          return;
+                        }
                         NotificationService().showTestNotification(
                           widget.reminder.medication,
                           widget.reminder.patient,
