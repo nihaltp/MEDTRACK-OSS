@@ -351,6 +351,11 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
                 );
               }
             }),
+            _buildActionButton(context, Icons.summarize, 'Report', Colors.teal,
+                onTap: () {
+              Navigator.pushNamed(context, Routes.consultReport,
+                  arguments: _currentPatient);
+            }),
           ],
         ),
     );
@@ -657,12 +662,42 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
                          padding: const EdgeInsets.only(top: 4),
                          child: Text(log.notes, style: const TextStyle(fontStyle: FontStyle.italic)),
                        ),
+                    if (log.environment != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Wrap(
+                          spacing: 8,
+                          children: [
+                            _buildEnvChip(Icons.thermostat, log.environment!.temperature),
+                            _buildEnvChip(Icons.water_drop, log.environment!.humidity),
+                            _buildEnvChip(Icons.air, 'AQI: ${log.environment!.aqi}'),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
-                isThreeLine: log.notes.isNotEmpty,
+                isThreeLine: log.notes.isNotEmpty || log.environment != null,
               ),
             );
           }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEnvChip(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: Colors.blue[700]),
+          const SizedBox(width: 4),
+          Text(label, style: TextStyle(fontSize: 10, color: Colors.blue[700], fontWeight: FontWeight.bold)),
         ],
       ),
     );
