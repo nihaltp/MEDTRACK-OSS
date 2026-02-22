@@ -5,9 +5,10 @@ class ScheduleEntry {
   final String dosage;
   final String time;
   final String patient;
-  final String status;
-  final Color statusColor;
+  String status;
+  Color statusColor;
   final String icon;
+  int id;
 
   ScheduleEntry({
     required this.medication,
@@ -17,5 +18,6 @@ class ScheduleEntry {
     required this.status,
     required this.statusColor,
     required this.icon,
+    required this.id,
   });
 }

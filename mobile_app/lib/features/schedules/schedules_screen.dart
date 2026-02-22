@@ -17,6 +17,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
   // Mock schedule data
   final List<ScheduleEntry> schedules = [
     ScheduleEntry(
+      id: 1,
       medication: 'Lisinopril',
       dosage: '10 mg',
       time: '08:00 AM',
@@ -26,6 +27,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       icon: '💊',
     ),
     ScheduleEntry(
+      id: 2,
       medication: 'Metformin',
       dosage: '500 mg',
       time: '12:30 PM',
@@ -35,6 +37,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       icon: '💉',
     ),
     ScheduleEntry(
+      id: 3,
       medication: 'Lisinopril',
       dosage: '10 mg',
       time: '08:00 PM',
@@ -44,6 +47,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       icon: '💊',
     ),
     ScheduleEntry(
+      id: 4,
       medication: 'Atorvastatin',
       dosage: '20 mg',
       time: '09:00 PM',
@@ -53,6 +57,7 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       icon: '⚕️',
     ),
     ScheduleEntry(
+      id: 5,
       medication: 'Aspirin',
       dosage: '81 mg',
       time: 'Tomorrow 08:00 AM',
@@ -62,6 +67,16 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       icon: '💊',
     ),
   ];
+
+  void markAsTaken(int id) {
+    setState(() {
+      final index = schedules.indexWhere((s) => s.id == id);
+      if (index != -1) {
+        schedules[index].status = 'Completed';
+        schedules[index].statusColor = const Color(0xFF4CAF50);
+      }
+    });
+  }
 
   String _filterValue = 'All';
 
@@ -131,7 +146,10 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
               itemCount: filteredSchedules.length,
               itemBuilder: (context, index) {
                 final schedule = filteredSchedules[index];
-                return _ScheduleCard(schedule: schedule);
+                return _ScheduleCard(
+                  schedule: schedule,
+                  onMarkAsTaken: () => markAsTaken(schedule.id),
+                );
               },
             ),
           ),
@@ -182,8 +200,9 @@ class _StatusChip extends StatelessWidget {
 
 class _ScheduleCard extends StatelessWidget {
   final ScheduleEntry schedule;
+  final VoidCallback onMarkAsTaken;
 
-  const _ScheduleCard({required this.schedule});
+  const _ScheduleCard({required this.schedule, required this.onMarkAsTaken});
 
   @override
   Widget build(BuildContext context) {
@@ -302,6 +321,7 @@ class _ScheduleCard extends StatelessWidget {
             schedule.status == 'Pending'
                 ? ElevatedButton.icon(
                     onPressed: () {
+                      onMarkAsTaken();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content: Text('Medication marked as taken!')),
