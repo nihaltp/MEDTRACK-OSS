@@ -384,14 +384,20 @@ class _ScheduleCard extends StatelessWidget {
                                   ? 'Afternoon'
                                   : 'Evening';
                           final newReminder = Reminder(
-                              id: DateTime.now().millisecondsSinceEpoch,
-                              medication: schedule.medication,
-                              patient: schedule.patient,
-                              scheduledTime: schedule.time,
-                              type: type,
-                              isEnabled: true,
-                              notificationCount: 0,
-                              icon: schedule.icon);
+                            id: DateTime.now()
+                                .millisecondsSinceEpoch
+                                .toString(),
+                            medication: schedule.medication,
+                            patient: schedule.patient,
+                            scheduledTime: schedule.time,
+                            type: type,
+                            isEnabled: true,
+                            notificationCount: 0,
+                            icon: schedule.icon,
+                            remindAt: DateFormat("hh:mm a")
+                                .parse(schedule.time)
+                                .add(const Duration(minutes: -15)),
+                          );
                           setReminder(context, newReminder);
                         },
                         icon: const Icon(Icons.notifications_rounded, size: 18),
