@@ -43,7 +43,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
       final timeMatch =
           RegExp(r'\d{1,2}:\d{2}\s?[APap][Mm]').firstMatch(timeString);
       if (timeMatch == null) {
-        throw FormatException("No time found");
+        throw const FormatException("No time found");
       }
 
       final timePart = timeMatch.group(0)!;
@@ -52,6 +52,15 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
     } catch (e) {
       return TimeOfDay.now();
     }
+  }
+
+  DateTime _calculateRemindAt(TimeOfDay time) {
+    final now = DateTime.now();
+    var scheduled = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    if (scheduled.isBefore(now)) {
+      scheduled = scheduled.add(const Duration(days: 1));
+    }
+    return scheduled;
   }
 
   @override
@@ -67,7 +76,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
             ),
           ),
           body: Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Form(
                 key: _formKey,
                 child: SingleChildScrollView(
@@ -83,28 +92,28 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                         },
                         decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
+                            borderSide: const BorderSide(
                               color: Colors.grey,
                               width: 1,
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
+                            borderSide: const BorderSide(
                               color: Colors.red,
                               width: 1,
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
+                            borderSide: const BorderSide(
                               color: Colors.blue,
                               width: 2,
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           focusedErrorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
+                            borderSide: const BorderSide(
                               color: Colors.blue,
                               width: 2,
                             ),
@@ -114,7 +123,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                         ),
                         onSaved: (value) => _patientName = value ?? '',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 15,
                       ),
                       TextFormField(
@@ -128,10 +137,10 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                         decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
                                 borderSide:
-                                    BorderSide(color: Colors.grey, width: 1),
+                                    const BorderSide(color: Colors.grey, width: 1),
                                 borderRadius: BorderRadius.circular(12)),
                             errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 color: Colors.red,
                                 width: 1,
                               ),
@@ -139,10 +148,10 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                             ),
                             focusedBorder: OutlineInputBorder(
                                 borderSide:
-                                    BorderSide(color: Colors.blue, width: 2),
+                                    const BorderSide(color: Colors.blue, width: 2),
                                 borderRadius: BorderRadius.circular(12)),
                             focusedErrorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 color: Colors.blue,
                                 width: 2,
                               ),
@@ -151,7 +160,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                             labelText: "Medication Name"),
                         onSaved: (value) => _medicationName = value ?? '',
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       DropdownButtonFormField(
                         validator: (value) {
                           if (value == null) {
@@ -163,28 +172,28 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                         hint: const Text("Type"),
                         decoration: InputDecoration(
                           enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
+                            borderSide: const BorderSide(
                               color: Colors.grey,
                               width: 1,
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
+                            borderSide: const BorderSide(
                               color: Colors.red,
                               width: 1,
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
+                            borderSide: const BorderSide(
                               color: Colors.blue,
                               width: 2,
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           focusedErrorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
+                            borderSide: const BorderSide(
                               color: Colors.blue,
                               width: 2,
                             ),
@@ -204,26 +213,26 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                         },
                         onSaved: (value) => _selectedType = value,
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       Card(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: ListTile(
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
-                            title: Text("Scheduled Time",
+                            title: const Text("Scheduled Time",
                                 style: TextStyle(
                                   color: Colors.grey,
                                   fontSize: 14,
                                 )),
-                            leading: Icon(
+                            leading: const Icon(
                               Icons.access_time_rounded,
                               color: Colors.blue,
                             ),
                             subtitle: Text(
                               _scheduledTime.format(context),
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
@@ -242,7 +251,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                                     });
                                   }
                                 },
-                                child: Text(
+                                child: const Text(
                                   "CHANGE",
                                   style: TextStyle(
                                       color: Colors.blue,
@@ -250,19 +259,19 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                                       fontWeight: FontWeight.bold),
                                 ))),
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       Card(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: ListTile(
                           contentPadding:
-                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          title: Text(
+                              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          title: const Text(
                             "Notifications",
                             style: TextStyle(color: Colors.grey, fontSize: 14),
                           ),
-                          leading: Icon(Icons.notification_add),
+                          leading: const Icon(Icons.notification_add),
                           iconColor: Colors.blue,
                           subtitle: Text(
                               "$_notificationCount ${_notificationCount == 1 ? 'notification' : 'notifications'} before"),
@@ -277,11 +286,11 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                                     });
                                   }
                                 },
-                                icon: Icon(Icons.remove),
+                                icon: const Icon(Icons.remove),
                               ),
                               Text(
                                 "$_notificationCount",
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 14, fontWeight: FontWeight.bold),
                               ),
                               IconButton(
@@ -292,18 +301,18 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                                     });
                                   }
                                 },
-                                icon: Icon(Icons.add),
+                                icon: const Icon(Icons.add),
                               ),
                             ],
                           ),
                         ),
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                             horizontal: 20,
                             vertical: 10,
                           ),
@@ -315,8 +324,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                           if (_formKey.currentState!.validate() &&
                               _selectedType != null) {
                             _formKey.currentState!.save();
-                            final reminderId = widget.reminderToEdit?.id ??
-                                DateTime.now().millisecondsSinceEpoch;
+                            final reminderId = widget.reminderToEdit?.id ?? "";
                             
                             final updatedReminder = Reminder(
                               id: reminderId,
@@ -326,6 +334,9 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                               type: _selectedType!,
                               isEnabled: _isEnabled,
                               notificationCount: _notificationCount,
+                              remindAt: _calculateRemindAt(_scheduledTime),
+                              snoozeCount: widget.reminderToEdit?.snoozeCount ?? 0,
+                              lastSnoozedAt: widget.reminderToEdit?.lastSnoozedAt,
                             );
 
                             Navigator.pop(context, updatedReminder);

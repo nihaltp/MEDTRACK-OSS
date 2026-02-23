@@ -12,6 +12,8 @@ class ReminderBase(BaseModel):
 	channel: Literal["email", "sms", "push"] = "push"
 	status: Literal["pending", "sent", "completed", "failed"] = "pending"
 	notes: Optional[str] = None
+	snooze_count: int = 0
+	last_snoozed_at: Optional[datetime] = None
 
 	@model_validator(mode="after")
 	def validate_dates(self):
@@ -32,6 +34,8 @@ class ReminderUpdate(BaseModel):
 	channel: Optional[Literal["email", "sms", "push"]] = None
 	status: Optional[Literal["pending", "sent", "completed", "failed"]] = None
 	notes: Optional[str] = None
+	snooze_count: Optional[int] = None
+	last_snoozed_at: Optional[datetime] = None
 
 
 class Reminder(ReminderBase):
