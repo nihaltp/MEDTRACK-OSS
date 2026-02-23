@@ -434,7 +434,6 @@ class _ScheduleCard extends StatelessWidget {
         arguments: newReminder);
 
     if (updatedReminder != null && updatedReminder is Reminder) {
-      reminders.value = [...reminders.value, updatedReminder];
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text('Reminder set for ${updatedReminder.scheduledTime}')),
