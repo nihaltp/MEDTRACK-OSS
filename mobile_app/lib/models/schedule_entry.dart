@@ -6,10 +6,10 @@ class ScheduleEntry {
   final DateTime date;
   final String time;
   final String patient;
-  final String status;
-  final Color statusColor;
-  final String icon;
+  String status;
+  Color statusColor;
   final String notes;
+  int id;
 
   ScheduleEntry({
     required this.medication,
@@ -20,6 +20,7 @@ class ScheduleEntry {
     required this.status,
     required this.statusColor,
     required this.icon,
+    required this.id,
     this.notes = '',
   });
 }

@@ -43,4 +43,24 @@ class Appointment {
       status: json['status'],
     );
   }
+
+  Appointment copyWith({
+    String? id,
+    String? patientId,
+    DateTime? date,
+    TimeOfDay? time,
+    String? type,
+    String? notes,
+    String? status,
+  }) {
+    return Appointment(
+      id: id ?? this.id,
+      patientId: patientId ?? this.patientId,
+      date: date ?? this.date,
+      time: time ?? this.time,
+      type: type ?? this.type,
+      notes: notes ?? this.notes,
+      status: status ?? this.status,
+    );
+  }
 }

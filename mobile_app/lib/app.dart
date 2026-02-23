@@ -5,6 +5,7 @@ import 'package:mobile_app/features/patients/widgets/add_patient_note_view.dart'
 import 'package:mobile_app/features/patients/widgets/patient_details_view.dart';
 import 'package:mobile_app/features/reminders/add_reminder_screen.dart';
 import 'package:mobile_app/features/schedules/schedule_appointment_view.dart';
+import 'package:mobile_app/models/appointment.dart';
 import 'package:mobile_app/models/medication.dart';
 import 'package:mobile_app/models/patient.dart';
 import 'package:mobile_app/models/patient_note.dart';
@@ -28,6 +29,13 @@ class MedTrackApp extends StatelessWidget {
             final patient = settings.arguments as Patient;
             return MaterialPageRoute(
               builder: (context) => ScheduleAppointmentView(patient: patient),
+            );
+          } else if (settings.arguments is Map<String, dynamic>) {
+            final args = settings.arguments as Map<String, dynamic>;
+            final patient = args['patient'] as Patient;
+            final appointment = args['appointment'] as Appointment?;
+            return MaterialPageRoute(
+              builder: (context) => ScheduleAppointmentView(patient: patient, existingAppointment: appointment),
             );
           }
           return MaterialPageRoute(builder: (context) => _errorScreen());
@@ -85,7 +93,7 @@ class MedTrackApp extends StatelessWidget {
               : null;
 
           return MaterialPageRoute(
-            builder: (context) => AddReminderScreen(newReminder: reminder),
+            builder: (context) => AddReminderScreen(reminderToEdit: reminder),
           );
         }
 
