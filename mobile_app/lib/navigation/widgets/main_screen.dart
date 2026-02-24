@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/features/home/home_screen.dart';
 import 'package:mobile_app/features/medications/medications_screen.dart';
 import 'package:mobile_app/features/patients/patients_screen.dart';
-import 'package:mobile_app/features/reminders/reminders_screen.dart';
 import 'package:mobile_app/features/schedules/schedules_screen.dart';
 import 'package:mobile_app/features/activity/activity_feed_screen.dart';
 import 'package:provider/provider.dart';

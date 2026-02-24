@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/routes.dart';
 import 'package:mobile_app/services/api_service.dart';
-import 'package:mobile_app/services/notification_service.dart';
 import '../../models/reminder.dart';
 import 'add_reminder_screen.dart';
 
@@ -395,7 +394,6 @@ class _ReminderCard extends StatelessWidget {
                   icon: const Icon(Icons.delete_outline_rounded, color: Colors.red),
                   style: IconButton.styleFrom(
                     padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
                   ),
                 ),
               ],

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobile_app/features/patients/patients_screen.dart';
 import 'package:mobile_app/features/patients/add_patient_screen.dart';
 import 'package:mobile_app/features/patients/widgets/patient_details_view.dart';
 import 'package:mobile_app/models/patient.dart';

@@ -4,7 +4,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../models/patient.dart';
 import '../../../models/appointment.dart';
 import '../../../models/patient_note.dart';
-import '../../../models/medication_log.dart';
 import '../../../models/goal.dart';
 import '../../../models/symptom_log.dart';
 import 'add_symptom_view.dart';

@@ -10,6 +10,7 @@ class ScheduleEntry {
   Color statusColor;
   final String notes;
   int id;
+  final String icon;
 
   ScheduleEntry({
     required this.medication,

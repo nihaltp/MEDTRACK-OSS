@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_app/models/reminder.dart';
 import 'package:mobile_app/models/schedule_entry.dart';
-import 'package:mobile_app/features/reminders/reminders_screen.dart';
 import 'package:mobile_app/routes.dart';
 import 'package:mobile_app/services/csv_export_service.dart';
-import 'package:intl/intl.dart';
 
 class SchedulesScreen extends StatefulWidget {
   const SchedulesScreen({super.key});
@@ -383,15 +381,27 @@ class _ScheduleCard extends StatelessWidget {
                                       6
                                   ? 'Afternoon'
                                   : 'Evening';
+                          final timeMatch =
+                              RegExp(r'\d{1,2}:\d{2}\s?[APap][Mm]')
+                                  .firstMatch(schedule.time);
+                          final String scheduledTime = timeMatch != null
+                              ? timeMatch.group(0)!
+                              : schedule.time;
                           final newReminder = Reminder(
-                              id: DateTime.now().millisecondsSinceEpoch,
-                              medication: schedule.medication,
-                              patient: schedule.patient,
-                              scheduledTime: schedule.time,
-                              type: type,
-                              isEnabled: true,
-                              notificationCount: 0,
-                              icon: schedule.icon);
+                            id: DateTime.now()
+                                .millisecondsSinceEpoch
+                                .toString(),
+                            medication: schedule.medication,
+                            patient: schedule.patient,
+                            scheduledTime: schedule.time,
+                            type: type,
+                            isEnabled: true,
+                            notificationCount: 0,
+                            icon: schedule.icon,
+                            remindAt: DateFormat("hh:mm a")
+                                .parse(scheduledTime)
+                                .add(const Duration(minutes: -15)),
+                          );
                           setReminder(context, newReminder);
                         },
                         icon: const Icon(Icons.notifications_rounded, size: 18),
@@ -428,7 +438,6 @@ class _ScheduleCard extends StatelessWidget {
         arguments: newReminder);
 
     if (updatedReminder != null && updatedReminder is Reminder) {
-      reminders.value = [...reminders.value, updatedReminder];
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text('Reminder set for ${updatedReminder.scheduledTime}')),
