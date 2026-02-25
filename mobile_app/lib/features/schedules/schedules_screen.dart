@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/models/reminder.dart';
 import 'package:mobile_app/models/schedule_entry.dart';
-import 'package:mobile_app/features/reminders/reminders_screen.dart';
 import 'package:mobile_app/routes.dart';
+import 'package:mobile_app/services/csv_export_service.dart';
 
 class SchedulesScreen extends StatefulWidget {
   const SchedulesScreen({super.key});
@@ -13,20 +14,29 @@ class SchedulesScreen extends StatefulWidget {
 }
 
 class _SchedulesScreenState extends State<SchedulesScreen> {
-  // Mock schedule data
+  // Date filter range
+  DateTime _startDate = DateTime.now().subtract(const Duration(days: 7));
+  DateTime _endDate = DateTime.now();
+
+  // Mock schedule data updated with dates
   final List<ScheduleEntry> schedules = [
     ScheduleEntry(
+      id: 1,
       medication: 'Lisinopril',
       dosage: '10 mg',
+      date: DateTime.now(),
       time: '08:00 AM',
       patient: 'John Doe',
       status: 'Completed',
       statusColor: const Color(0xFF4CAF50),
       icon: '💊',
+      notes: 'Taken with water',
     ),
     ScheduleEntry(
+      id: 2,
       medication: 'Metformin',
       dosage: '500 mg',
+      date: DateTime.now(),
       time: '12:30 PM',
       patient: 'John Doe',
       status: 'Pending',
@@ -34,8 +44,10 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       icon: '💉',
     ),
     ScheduleEntry(
+      id: 3,
       medication: 'Lisinopril',
       dosage: '10 mg',
+      date: DateTime.now(),
       time: '08:00 PM',
       patient: 'John Doe',
       status: 'Upcoming',
@@ -43,8 +55,10 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       icon: '💊',
     ),
     ScheduleEntry(
+      id: 4,
       medication: 'Atorvastatin',
       dosage: '20 mg',
+      date: DateTime.now().subtract(const Duration(days: 1)),
       time: '09:00 PM',
       patient: 'Jane Smith',
       status: 'Completed',
@@ -52,8 +66,10 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       icon: '⚕️',
     ),
     ScheduleEntry(
+      id: 5,
       medication: 'Aspirin',
       dosage: '81 mg',
+      date: DateTime.now().add(const Duration(days: 1)),
       time: 'Tomorrow 08:00 AM',
       patient: 'Michael Johnson',
       status: 'Upcoming',
@@ -61,6 +77,16 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       icon: '💊',
     ),
   ];
+
+  void markAsTaken(int id) {
+    setState(() {
+      final index = schedules.indexWhere((s) => s.id == id);
+      if (index != -1) {
+        schedules[index].status = 'Completed';
+        schedules[index].statusColor = const Color(0xFF4CAF50);
+      }
+    });
+  }
 
   String _filterValue = 'All';
 
@@ -74,6 +100,13 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
       appBar: AppBar(
         title: const Text('Medication Schedules'),
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () => _exportCsv(context),
+            icon: const Icon(Icons.download_rounded),
+            tooltip: 'Export CSV',
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -130,13 +163,39 @@ class _SchedulesScreenState extends State<SchedulesScreen> {
               itemCount: filteredSchedules.length,
               itemBuilder: (context, index) {
                 final schedule = filteredSchedules[index];
-                return _ScheduleCard(schedule: schedule);
+                return _ScheduleCard(
+                  schedule: schedule,
+                  onMarkAsTaken: () => markAsTaken(schedule.id),
+                );
               },
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _exportCsv(BuildContext context) async {
+    // Filter by date range
+    final filtered = schedules.where((s) {
+      return s.date.isAfter(_startDate.subtract(const Duration(seconds: 1))) &&
+          s.date.isBefore(_endDate.add(const Duration(seconds: 1)));
+    }).toList();
+
+    if (filtered.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No data found for the selected range')),
+      );
+      return;
+    }
+
+    try {
+      await CsvExportService.exportAdherenceReport(filtered);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export failed: $e')),
+      );
+    }
   }
 }
 
@@ -181,8 +240,9 @@ class _StatusChip extends StatelessWidget {
 
 class _ScheduleCard extends StatelessWidget {
   final ScheduleEntry schedule;
+  final VoidCallback onMarkAsTaken;
 
-  const _ScheduleCard({required this.schedule});
+  const _ScheduleCard({required this.schedule, required this.onMarkAsTaken});
 
   @override
   Widget build(BuildContext context) {
@@ -301,6 +361,7 @@ class _ScheduleCard extends StatelessWidget {
             schedule.status == 'Pending'
                 ? ElevatedButton.icon(
                     onPressed: () {
+                      onMarkAsTaken();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content: Text('Medication marked as taken!')),
@@ -312,15 +373,35 @@ class _ScheduleCard extends StatelessWidget {
                 : schedule.status == 'Upcoming'
                     ? OutlinedButton.icon(
                         onPressed: () {
+                          final String type = schedule.time.contains('AM')
+                              ? 'Morning'
+                              : DateFormat("hh:mm a")
+                                          .parse(schedule.time)
+                                          .hour <
+                                      6
+                                  ? 'Afternoon'
+                                  : 'Evening';
+                          final timeMatch =
+                              RegExp(r'\d{1,2}:\d{2}\s?[APap][Mm]')
+                                  .firstMatch(schedule.time);
+                          final String scheduledTime = timeMatch != null
+                              ? timeMatch.group(0)!
+                              : schedule.time;
                           final newReminder = Reminder(
-                              id: DateTime.now().millisecondsSinceEpoch,
-                              medication: schedule.medication,
-                              patient: schedule.patient,
-                              scheduledTime: schedule.time,
-                              type: "",
-                              isEnabled: true,
-                              notificationCount: 0,
-                              icon: schedule.icon);
+                            id: DateTime.now()
+                                .millisecondsSinceEpoch
+                                .toString(),
+                            medication: schedule.medication,
+                            patient: schedule.patient,
+                            scheduledTime: schedule.time,
+                            type: type,
+                            isEnabled: true,
+                            notificationCount: 0,
+                            icon: schedule.icon,
+                            remindAt: DateFormat("hh:mm a")
+                                .parse(scheduledTime)
+                                .add(const Duration(minutes: -15)),
+                          );
                           setReminder(context, newReminder);
                         },
                         icon: const Icon(Icons.notifications_rounded, size: 18),
@@ -357,7 +438,6 @@ class _ScheduleCard extends StatelessWidget {
         arguments: newReminder);
 
     if (updatedReminder != null && updatedReminder is Reminder) {
-      reminders.value = [...reminders.value, updatedReminder];
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text('Reminder set for ${updatedReminder.scheduledTime}')),
