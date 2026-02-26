@@ -4,7 +4,7 @@ import 'package:mobile_app/routes.dart';
 import '../../models/medication.dart';
 import '../../models/audit_log_entry.dart';
 import 'package:provider/provider.dart';
-import '../../services/profile_provider.dart';
+import 'package:mobile_app/features/medications/widgets/medication_card.dart';
 
 class MedicationsScreen extends StatefulWidget {
   const MedicationsScreen({super.key});
@@ -28,6 +28,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
       color: const Color(0xFFFF6B6B),
       nextDue: '2:00 PM',
       isActive: true,
+      pillsRemaining: 30,
     ),
     Medication(
       id: 2,
@@ -40,6 +41,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
       color: const Color(0xFF00B4D8),
       nextDue: '1:30 PM',
       isActive: true,
+      pillsRemaining: 45,
     ),
     Medication(
       id: 3,
@@ -52,6 +54,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
       color: const Color(0xFF4CAF50),
       nextDue: '8:00 PM',
       isActive: true,
+      pillsRemaining: 15,
     ),
     Medication(
       id: 4,
@@ -64,6 +67,7 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
       color: const Color(0xFFFFC107),
       nextDue: 'Tomorrow 8:00 AM',
       isActive: false,
+      pillsRemaining: 5,
     ),
   ];
 
@@ -151,9 +155,8 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                 itemCount: profileMeds.length,
                 itemBuilder: (context, index) {
                   final medication = profileMeds[index];
-                  return _MedicationCard(
+                  return MedicationCard(
                     medication: medication,
-                    profileProvider: profileProvider,
                     onEdit: () => _editMedication(context, medication),
                     onTakeDose: () {
                       setState(() {
@@ -235,23 +238,12 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
               ),
             );
           }
-          await _newMedication(context);
         },
         heroTag: 'add_medication_fab',
         backgroundColor: const Color(0xFF0066CC),
         child: const Icon(Icons.add_rounded),
       ),
     );
-  }
-
-  Future<void> _newMedication(BuildContext context) async {
-    final newMedication =
-        await Navigator.pushNamed(context, Routes.addMedication);
-    if (newMedication != null && newMedication is Medication) {
-      setState(() {
-        medications.add(newMedication);
-      });
-    }
   }
 
   Future<void> _editMedication(
@@ -302,242 +294,6 @@ class _FilterChip extends StatelessWidget {
             fontWeight: FontWeight.w600,
             color: isActive ? Colors.white : Colors.black54,
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MedicationCard extends StatelessWidget {
-  final Medication medication;
-  final ProfileProvider profileProvider;
-  final VoidCallback onEdit;
-  final VoidCallback? onTakeDose; // Add onTakeDose callback
-
-  const _MedicationCard({required this.medication, required this.profileProvider, required this.onEdit, this.onTakeDose});
-
-  @override
-  Widget build(BuildContext context) {
-    bool isLowInventory = medication.pillsRemaining <= 5;
-    bool needsDoctorAuth = isLowInventory && (medication.refillsRemaining == null || medication.refillsRemaining == 0);
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isLowInventory 
-                ? Colors.redAccent.withOpacity(0.5) 
-                : medication.isActive
-                  ? medication.color.withOpacity(0.2)
-                  : Colors.grey[200]!,
-            width: isLowInventory ? 2 : 1,
-          ),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                // Icon
-                Container(
-                  decoration: BoxDecoration(
-                    color: medication.color.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    medication.icon,
-                    style: const TextStyle(fontSize: 28),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // Medication Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              medication.name,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: medication.isActive
-                                  ? const Color(0xFF4CAF50).withOpacity(0.1)
-                                  : Colors.grey[200],
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
-                            child: Text(
-                              medication.isActive ? 'Active' : 'Inactive',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: medication.isActive
-                                    ? const Color(0xFF4CAF50)
-                                    : Colors.black54,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        medication.dosage,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        medication.frequency,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.info_outline_rounded,
-                    size: 16,
-                    color: Colors.black54,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      medication.purpose,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            // Refill Warning Section
-            if (isLowInventory) ...[
-              const SizedBox(height: 12),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.red[50],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    Icon(
-                      needsDoctorAuth ? Icons.warning_amber_rounded : Icons.local_pharmacy_outlined,
-                      size: 20,
-                      color: Colors.red[700],
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            needsDoctorAuth 
-                              ? 'Contact Doctor: 0 Refills Left!' 
-                              : 'Low Supply: ${medication.pillsRemaining} pills left',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red[700],
-                            ),
-                          ),
-                          if (!needsDoctorAuth)
-                            Text(
-                              'Rx: ${medication.rxNumber ?? 'Unknown'} • Refills: ${medication.refillsRemaining}',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.red[700],
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.schedule_rounded,
-                        size: 16,
-                        color: medication.color,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Next: ${medication.nextDue}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: medication.color,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (onTakeDose != null)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: ElevatedButton.icon(
-                      onPressed: onTakeDose,
-                      icon: const Icon(Icons.check_circle_outline, size: 16),
-                      label: const Text('Take'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                OutlinedButton.icon(
-                  onPressed: onEdit,
-                  icon: const Icon(Icons.edit_rounded, size: 16),
-                  label: const Text('Edit'),
-                ),
-              ],
-            ),
-          ],
         ),
       ),
     );
