@@ -6,10 +6,10 @@ class AddSymptomView extends StatefulWidget {
   final String patientId;
 
   const AddSymptomView({
-    Key? key,
+    super.key,
     required this.onSave,
     required this.patientId,
-  }) : super(key: key);
+  });
 
   @override
   State<AddSymptomView> createState() => _AddSymptomViewState();

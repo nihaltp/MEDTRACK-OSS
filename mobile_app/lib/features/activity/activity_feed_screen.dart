@@ -4,7 +4,7 @@ import '../../services/profile_provider.dart';
 import '../../models/audit_log_entry.dart';
 
 class ActivityFeedScreen extends StatelessWidget {
-  const ActivityFeedScreen({Key? key}) : super(key: key);
+  const ActivityFeedScreen({super.key});
   static const String route = '/activity_feed';
 
   @override
