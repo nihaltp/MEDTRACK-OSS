@@ -183,27 +183,27 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          RadioListTile<String>(
-                            title: const Text('Male'),
-                            value: 'Male',
-                            groupValue: _gender.isNotEmpty ? _gender : null,
-                            onChanged: (value) => setState(() {
-                              _gender = value!;
-                              _genderFocusNode.requestFocus();
-                            }),
-                          ),
-                          RadioListTile<String>(
-                            title: const Text('Female'),
-                            value: 'Female',
-                            groupValue: _gender.isNotEmpty ? _gender : null,
-                            onChanged: (value) => setState(() {
-                              _gender = value!;
-                              _genderFocusNode.requestFocus();
-                            }),
-                          ),
-                        ],
+                      child: RadioGroup<String>(
+                        groupValue: _gender.isNotEmpty ? _gender : null,
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() {
+                            _gender = value;
+                            _genderFocusNode.requestFocus();
+                          });
+                        },
+                        child: Column(
+                          children: const [
+                            RadioListTile<String>(
+                              title: Text('Male'),
+                              value: 'Male',
+                            ),
+                            RadioListTile<String>(
+                              title: Text('Female'),
+                              value: 'Female',
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -270,36 +270,31 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          RadioListTile<String>(
-                            title: const Text('Stable'),
-                            value: 'Stable',
-                            groupValue: _status.isNotEmpty ? _status : null,
-                            onChanged: (value) => setState(() {
-                              _status = value!;
-                              _statusFocusNode.requestFocus();
-                            }),
-                          ),
-                          RadioListTile<String>(
-                            title: const Text('Critical'),
-                            value: 'Critical',
-                            groupValue: _status.isNotEmpty ? _status : null,
-                            onChanged: (value) => setState(() {
-                              _status = value!;
-                              _statusFocusNode.requestFocus();
-                            }),
-                          ),
-                          RadioListTile<String>(
-                            title: const Text('Recovering'),
-                            value: 'Recovering',
-                            groupValue: _status.isNotEmpty ? _status : null,
-                            onChanged: (value) => setState(() {
-                              _status = value!;
-                              _statusFocusNode.requestFocus();
-                            }),
-                          ),
-                        ],
+                      child: RadioGroup<String>(
+                        groupValue: _status.isNotEmpty ? _status : null,
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() {
+                            _status = value;
+                            _statusFocusNode.requestFocus();
+                          });
+                        },
+                        child: const Column(
+                          children: [
+                            RadioListTile<String>(
+                              title: Text('Stable'),
+                              value: 'Stable',
+                            ),
+                            RadioListTile<String>(
+                              title: Text('Critical'),
+                              value: 'Critical',
+                            ),
+                            RadioListTile<String>(
+                              title: Text('Recovering'),
+                              value: 'Recovering',
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
