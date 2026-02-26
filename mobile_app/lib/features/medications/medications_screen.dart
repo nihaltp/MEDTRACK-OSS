@@ -5,6 +5,7 @@ import '../../models/medication.dart';
 import '../../models/audit_log_entry.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/features/medications/widgets/medication_card.dart';
+import 'package:mobile_app/features/medications/widgets/medication_error_boundary.dart';
 
 class MedicationsScreen extends StatefulWidget {
   const MedicationsScreen({super.key});
@@ -72,6 +73,30 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
   ];
 
   String _filterValue = 'All';
+  bool _isLoading = false;
+  bool _hasError = false;
+
+  void _fetchMedications() {
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
+    // Simulate loading/error detection
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _hasError = false; // Set to true to test error boundary
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMedications();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,25 +149,28 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
           ),
           // Medications List
           Expanded(
-            child: Consumer<ProfileProvider>(
+            child: MedicationErrorBoundary(
+              hasError: _hasError,
+              onRetry: _fetchMedications,
+              child: Consumer<ProfileProvider>(
                 builder: (context, profileProvider, child) {
-              final activeProfileId = profileProvider.activeProfile?.id;
+                  final activeProfileId = profileProvider.activeProfile?.id;
 
-              // Mock filtering logic for medications
-              final profileMeds = filteredMeds.where((m) {
-                bool matchesProfile = false;
-                if (activeProfileId == 'D001' && (m.id == 1 || m.id == 2))
-                  matchesProfile = true;
-                if (activeProfileId == 'D002' && m.id == 3)
-                  matchesProfile = true;
-                if (activeProfileId == 'D003' && m.id == 4)
-                  matchesProfile = true;
+                  // Mock filtering logic for medications
+                  final profileMeds = filteredMeds.where((m) {
+                    bool matchesProfile = false;
+                    if (activeProfileId == 'D001' && (m.id == 1 || m.id == 2))
+                      matchesProfile = true;
+                    if (activeProfileId == 'D002' && m.id == 3)
+                      matchesProfile = true;
+                    if (activeProfileId == 'D003' && m.id == 4)
+                      matchesProfile = true;
 
-                if ([1, 2, 3, 4].contains(m.id) == false) {
-                  matchesProfile = true;
-                }
-                return matchesProfile;
-              }).toList();
+                    if ([1, 2, 3, 4].contains(m.id) == false) {
+                      matchesProfile = true;
+                    }
+                    return matchesProfile;
+                  }).toList();
 
               if (profileMeds.isEmpty) {
                 return const Center(
