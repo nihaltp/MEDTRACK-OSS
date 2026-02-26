@@ -32,8 +32,8 @@ class MedicationCard extends StatelessWidget {
             color: isLowInventory 
                 ? const Color(0xFFD32F2F) // High contrast Red (700)
                 : medication.isActive
-                  ? medication.color.withOpacity(0.4)
-                  : Colors.grey[400]!, // Clearer 'Inactive' state
+                    ? medication.color.withValues(alpha: 0.4)
+                    : Colors.grey[400]!, // Clearer 'Inactive' state
             width: isLowInventory ? 2 : 1.5,
           ),
         ),
@@ -52,7 +52,7 @@ class MedicationCard extends StatelessWidget {
                   label: const Icon(Icons.warning, size: 12, color: Colors.white),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: medication.color.withOpacity(0.25),
+                      color: medication.color.withValues(alpha: 0.25),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     padding: const EdgeInsets.all(12),
@@ -83,7 +83,8 @@ class MedicationCard extends StatelessWidget {
                           Container(
                             decoration: BoxDecoration(
                               color: medication.isActive
-                                  ? const Color(0xFF1B5E20).withOpacity(0.12) // Darker green
+                                  ? const Color(0xFF1B5E20)
+                                      .withValues(alpha: 0.12) // Darker green
                                   : Colors.grey[200],
                               borderRadius: BorderRadius.circular(6),
                             ),

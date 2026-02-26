@@ -309,7 +309,7 @@ class _ProfessionalPatientsScreenState
               child: InputChip(
                 label: Text('Gender: $_selectedGender'),
                 onDeleted: () => setState(() => _selectedGender = null),
-                backgroundColor: Colors.blue.withOpacity(0.1),
+                backgroundColor: Colors.blue.withValues(alpha: 0.1),
                 deleteIconColor: Colors.blue,
               ),
             ),
@@ -319,7 +319,7 @@ class _ProfessionalPatientsScreenState
               child: InputChip(
                 label: Text('Condition: $_selectedCondition'),
                 onDeleted: () => setState(() => _selectedCondition = null),
-                backgroundColor: Colors.blue.withOpacity(0.1),
+                backgroundColor: Colors.blue.withValues(alpha: 0.1),
                 deleteIconColor: Colors.blue,
               ),
             ),

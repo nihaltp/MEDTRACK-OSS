@@ -218,7 +218,7 @@ class _StatusChip extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: isActive ? color.withOpacity(0.15) : Colors.grey[100],
+          color: isActive ? color.withValues(alpha: 0.15) : Colors.grey[100],
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isActive ? color : Colors.grey[300]!,
@@ -264,7 +264,7 @@ class _ScheduleCard extends StatelessWidget {
                 // Icon
                 Container(
                   decoration: BoxDecoration(
-                    color: schedule.statusColor.withOpacity(0.15),
+                    color: schedule.statusColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(10),
@@ -300,7 +300,7 @@ class _ScheduleCard extends StatelessWidget {
                 // Status Badge
                 Container(
                   decoration: BoxDecoration(
-                    color: schedule.statusColor.withOpacity(0.15),
+                    color: schedule.statusColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   padding:

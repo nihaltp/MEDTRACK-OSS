@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           padding: const EdgeInsets.all(12),
@@ -215,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0066CC).withOpacity(0.1),
+                        color: const Color(0xFF0066CC).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.all(8),
@@ -288,8 +288,8 @@ class _ActionCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             gradient: LinearGradient(
               colors: [
-                color.withOpacity(0.1),
-                color.withOpacity(0.05),
+                color.withValues(alpha: 0.1),
+                color.withValues(alpha: 0.05),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -302,7 +302,7 @@ class _ActionCard extends StatelessWidget {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 padding: const EdgeInsets.all(10),
@@ -360,7 +360,7 @@ class _FeatureItem extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF0066CC).withOpacity(0.1),
+              color: const Color(0xFF0066CC).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             padding: const EdgeInsets.all(10),

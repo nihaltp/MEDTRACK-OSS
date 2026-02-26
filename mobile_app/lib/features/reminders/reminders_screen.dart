@@ -239,7 +239,9 @@ class _ReminderCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isEnabled ? typeColor.withOpacity(0.2) : Colors.grey[200]!,
+            color: isEnabled
+                ? typeColor.withValues(alpha: 0.2)
+                : Colors.grey[200]!,
           ),
           color: isEnabled ? Colors.white : Colors.grey[50],
         ),
@@ -250,7 +252,7 @@ class _ReminderCard extends StatelessWidget {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: typeColor.withOpacity(0.15),
+                    color: typeColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(10),
@@ -276,7 +278,7 @@ class _ReminderCard extends StatelessWidget {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              color: typeColor.withOpacity(0.15),
+                              color: typeColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             padding: const EdgeInsets.symmetric(

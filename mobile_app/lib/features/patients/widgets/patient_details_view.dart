@@ -549,7 +549,9 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: isTaken ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+                  backgroundColor: isTaken
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : Colors.orange.withValues(alpha: 0.1),
                   child: Icon(
                     isTaken ? Icons.check : Icons.close,
                     color: isTaken ? Colors.green : Colors.orange,
@@ -645,7 +647,7 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: severityColor.withOpacity(0.1),
+                  backgroundColor: severityColor.withValues(alpha: 0.1),
                   child: Text(
                     log.severity.toString(),
                     style: TextStyle(color: severityColor, fontWeight: FontWeight.bold),
@@ -688,7 +690,7 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1),
+        color: Colors.blue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
@@ -742,7 +744,7 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.orange.withOpacity(0.1),
+                              color: Colors.orange.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -925,11 +927,14 @@ class _PatientDetailsViewState extends State<PatientDetailsView> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: milestone.isCompleted ? Colors.green.withOpacity(0.05) : Colors.grey.shade50,
+                      color: milestone.isCompleted
+                          ? Colors.green.withValues(alpha: 0.05)
+                          : Colors.grey.shade50,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                         color: milestone.isCompleted ? Colors.green.withOpacity(0.3) : Colors.grey.shade200
-                      ),
+                          color: milestone.isCompleted
+                              ? Colors.green.withValues(alpha: 0.3)
+                              : Colors.grey.shade200),
                     ),
                     child: Row(
                       children: [
