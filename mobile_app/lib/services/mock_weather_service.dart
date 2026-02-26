@@ -18,8 +18,8 @@ class MockWeatherService {
     final pollen = pollenLevels[random.nextInt(pollenLevels.length)];
 
     return EnvironmentalContext(
-      temperature: '${temp}°C',
-      humidity: '${humidity}%',
+      temperature: '$temp°C',
+      humidity: '$humidity%',
       aqi: aqi,
       pollenLevel: pollen,
     );
