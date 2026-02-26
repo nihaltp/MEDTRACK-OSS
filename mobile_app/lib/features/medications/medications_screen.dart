@@ -160,12 +160,15 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
                 // Mock filtering logic for medications
                 final profileMeds = filteredMeds.where((m) {
                   bool matchesProfile = false;
-                  if (activeProfileId == 'D001' && (m.id == 1 || m.id == 2))
+                  if (activeProfileId == 'D001' && (m.id == 1 || m.id == 2)) {
                     matchesProfile = true;
-                  if (activeProfileId == 'D002' && m.id == 3)
+                  }
+                  if (activeProfileId == 'D002' && m.id == 3) {
                     matchesProfile = true;
-                  if (activeProfileId == 'D003' && m.id == 4)
+                  }
+                  if (activeProfileId == 'D003' && m.id == 4) {
                     matchesProfile = true;
+                  }
 
                   if ([1, 2, 3, 4].contains(m.id) == false) {
                     matchesProfile = true;
