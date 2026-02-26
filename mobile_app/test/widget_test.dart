@@ -6,14 +6,14 @@ import 'package:mobile_app/models/patient.dart';
 import 'package:mobile_app/routes.dart';
 
 void main() {
-  Future<void> _setLargeTestSurface(WidgetTester tester) async {
+  Future<void> setLargeTestSurface(WidgetTester tester) async {
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = const Size(1200, 2400);
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
   }
 
-  Future<void> _addPatient(
+  Future<void> addPatient(
     WidgetTester tester, {
     required String name,
     required String age,
@@ -38,18 +38,16 @@ void main() {
   testWidgets(
     'added patient is shown in list and opens patient profile',
     (WidgetTester tester) async {
-      await _setLargeTestSurface(tester);
-      await tester.pumpWidget(
-        MaterialApp(
-          routes: getRoutes(),
-          onGenerateRoute: (settings) {
-            return generateRoute(settings);
-          },
-          initialRoute: Routes.patients,
-        )
-      );
+      await setLargeTestSurface(tester);
+      await tester.pumpWidget(MaterialApp(
+        routes: getRoutes(),
+        onGenerateRoute: (settings) {
+          return generateRoute(settings);
+        },
+        initialRoute: Routes.patients,
+      ));
 
-      await _addPatient(
+      await addPatient(
         tester,
         name: 'John Doe',
         age: '34',
@@ -75,16 +73,14 @@ void main() {
   testWidgets(
     'adding patient clears active search so new row is visible',
     (WidgetTester tester) async {
-      await _setLargeTestSurface(tester);
-      await tester.pumpWidget(
-        MaterialApp(
-          routes: getRoutes(),
-          onGenerateRoute: (settings) {
-            return generateRoute(settings);
-          },
-          initialRoute: Routes.patients,
-        )
-      );
+      await setLargeTestSurface(tester);
+      await tester.pumpWidget(MaterialApp(
+        routes: getRoutes(),
+        onGenerateRoute: (settings) {
+          return generateRoute(settings);
+        },
+        initialRoute: Routes.patients,
+      ));
 
       await tester.enterText(
         find.byType(TextField),
@@ -93,7 +89,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Rajesh Kumar'), findsNothing);
 
-      await _addPatient(
+      await addPatient(
         tester,
         name: 'Alice Brown',
         age: '29',
@@ -119,7 +115,7 @@ MaterialPageRoute<dynamic>? generateRoute(RouteSettings settings) {
     );
   }
   if (settings.name == Routes.patientDetails) {
-    if (settings.arguments is !Patient) {
+    if (settings.arguments is! Patient) {
       return null;
     }
     final patient = settings.arguments as Patient;
